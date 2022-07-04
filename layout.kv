@@ -11,6 +11,7 @@
             pos: self.pos
             size: self.size
     Menu:
+        id: mainmenu
     GameWidget:
         id: gw
     KaruHouse:
@@ -25,6 +26,8 @@
     size: root.width, root.height
     secondary_color: .4,.4,.4,1
     secondary_color2: 0,.7,.7,1
+    #highscore_menu: root.label_highscore
+    #wallet_menu: root.label_wallet
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -97,12 +100,13 @@
 
     Label:
         id: highscore_menu
-        text: str(root.highscore)
+        text: str(round(root.highscore))
         bold: True
         pos_hint: {'center_x': .55, 'center_y': .62}
 
     Label:
-        text: str(root.wallet)
+        id: wallet_menu
+        text: str(round(root.wallet))
         bold: True
         pos_hint: {'center_x': .55, 'center_y': .58}
 
@@ -116,14 +120,10 @@
         pos_hint: {'center_x': .45, 'center_y': .62}
         source: 'resources/icons/crown.png'
 
-
-
-
-
-
 <LetterButton@Button>
     background_color: 0,0,0,0  # the last zero is the critical on, make invisible
     secondary_color2: 0,.7,.7,.8
+    on_press: self.state=='down'
     opacity: 0
     canvas.before:
         Color:
@@ -139,6 +139,7 @@
     charpos: app.root.ids.gw.charpos
     on_press: self.text = '_'; app.root.ids.gw.charpos==self.charpos; app.root.ids.gw.backspace()
     on_release: self.state='down'
+    size_hint: .2, .2
     canvas.before:
         Color:
             rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
@@ -175,7 +176,7 @@
         Button:
             text: 'Menu'
             on_press: root.gw.early_stop = 1; print('early stop')
-            on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'
+            on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
             font_size: 32
             size: root.width/4, root.height/12
             size_hint: None, None
@@ -209,166 +210,232 @@
                     pos: self.width*1.9, self.height*6
                     source: 'resources/icons/play.png'
 
+
+<BackgroundButton@ToggleButton>:
+    group: 'bg_buttons'
+    text: ''
+    bold: True
+    background_color: 0, 0, 0, 0
+    backgroundnumber: 1
+    on_press: self.change_bg_value()
+    disabled: True if self.state=='down' else False
+    size_hint_x: .5
+    size_hint_y: None
+    height: 180
+
+    canvas.before:
+        Color:
+            rgba: (1,1,1,1) if self.state=='normal' else (0,.7,.7,1)
+        RoundedRectangle:
+            size: self.width, self.height
+            pos: self.pos
+            source: ('resources/backgrounds/wallpaper%s.png' % self.backgroundnumber) if self.backgroundnumber > 1 else 'resources/backgrounds/wallpaper.png'
+
+
+    Button:
+        id: lock_button
+        on_press: print('Locked')
+        size: root.size
+        pos: root.pos
+        background_color: 0, 0, 0, 0
+        canvas.after:
+            Color:
+                rgba: (0, 0, 0, .75)
+            RoundedRectangle:
+                size: self.width, self.height
+                pos: self.pos
+
+
+    Image:
+        id: lock_img
+        pos: root.x+5, root.center_y+40
+        size: 40, 40
+        source: 'resources/icons/padlock.png'
+
+
+<BuyButton@Button>:
+    text: '   250'
+    bold: True
+    background_color: 0, 0, 0, 0
+    size_hint_y: None
+    height: 80
+    backgroundnumber_buy: 1
+
+    canvas.before:
+        Color:
+            rgba: (.4,.4,.4,1) if self.state=='normal' else (0,.7,.7,1)
+        RoundedRectangle:
+            size: self.width, self.height
+            pos: self.pos
+    Image:
+        id: coin_icon
+        source: 'resources/icons/karucoin_single.png' if self.disabled==False else 'resources/icons/check.png'
+        size: 50, 50
+        pos: (root.x, root.y+15) if self.disabled==False else (root.x+40, root.y+15)
+        pos_hint: {'x':1, 'y':1}
+
+
 #: import Clock kivy.clock.Clock
-<PopupBg@Popup>:
+<PopupBg>:
+    id: popupbg
     size_hint_y: .65
     size_hint_x: .8
 
     #kh: app.root.ids.kh
     title: ('KaruCoins: ' + str(round(self.wallet)))
-    bg_btn1: bg_btn1
+#    bg_btn1: bg_btn1
+#
+#
+#    bg_btn2: bg_btn2
+#    buy_btn2: buy_btn2
+#
+#    bg_btn3: bg_btn3
+#    buy_btn3: buy_btn3
+
+#    on_open: Clock.schedule_once(self.update, -1); Clock.schedule_interval(self.update, .1)
+#    on_dismiss: Clock.unschedule(self.update)
 
 
-    bg_btn2: bg_btn2
-    buy_btn2: buy_btn2
-
-    bg_btn3: bg_btn3
-    buy_btn3: buy_btn3
-
-    on_open: Clock.schedule_once(self.update, -1); Clock.schedule_interval(self.update, .1)
-    on_dismiss: Clock.unschedule(self.update)
-
-
-
-    ScrollView:
-
-        do_scroll_x: True
-        do_scroll_y: False
-        pos: root.width, root.height
-        GridLayout:
-            cols: 3
-            rows: 2
-            padding: 135, 75, 135 ,75
-            spacing: 165, 25
-            size_hint_y: None
-            height: self.minimum_height
-            size_hint_x: None
-            width: self.minimum_width
-            Button:
-                id: bg_btn1
-                on_press: root.current_bg = 1 #root.test() ; self.disabled = True; bg2.disabled = False
-                on_release: root.background_change(); root.selected = 0
-                font_size: 32
-                size: 360/1.5, 640/1.5
-                size_hint: None, None
-                pos: root.width/4, root.height/6
-                background_color: 0, 0, 0, 0
-                canvas.before:
-                    Color:
-                        rgba: (1,1,1,1)# if root.bg != 'resources/backgrounds/wallpaper.png' else (0, .7, .7, .7)
-                    RoundedRectangle:
-                        size: self.width, self.height
-                        pos: self.pos
-                        source: root.packData.backgrounds[1]
-
-            Button:
-                id: bg_btn2
-                disabled: True if not root.bg_unlocked['bg2'] else False
-                color: 1, 1, 1, 1
-                on_press: root.current_bg = 2
-                on_release: root.background_change(); root.selected = 0
-                font_size: 30
-                size: 360/1.5, 640/1.5
-                size_hint: None, None
-                pos: root.width/4, root.height/6
-                background_color: 0, 0, 0, 0
-                canvas.before:
-                    Color:
-                        rgba: (1,1,1,1)# if bg_btn2.disabled==False else (1,1,1, .5)
-                    RoundedRectangle:
-                        size: self.width, self.height
-                        pos: self.pos
-                        source: root.packData.backgrounds[2]
-                canvas.after:
-                    Color:
-                        rgba: (1,1,1,0) if bg_btn2.disabled==False else (115/255,115/255,115/255, .9)
-                    RoundedRectangle:
-                        size: self.width, self.height
-                        pos: self.pos
-
-            Button:
-                id: bg_btn3
-                disabled: True if not root.bg_unlocked['bg3'] else False
-                color: 1, 1, 1, 1
-                on_press: root.current_bg = 3# root.test()#; self.disabled = True; bg1.disabled = False
-                on_release: root.background_change(); root.selected = 0
-                font_size: 30
-                size: 360/1.5, 640/1.5
-                size_hint: None, None
-                pos: root.width/4, root.height/6
-                background_color: 0, 0, 0, 0
-                canvas.before:
-                    Color:
-                        rgba: (1,1,1,1) #if bg_btn3.disabled==False else (1,1,1, .3)
-                    RoundedRectangle:
-                        size: self.width, self.height
-                        pos: self.pos
-                        source: root.packData.backgrounds[3]
-                canvas.after:
-                    Color:
-                        rgba: (1,1,1,0) if bg_btn3.disabled==False else (115/255,115/255,115/255, .9)
-                    RoundedRectangle:
-                        size: self.width, self.height
-                        pos: self.pos
-
-            Button:
-                id: buy_btn1
-                disabled: True
-                text: root.price_str if not root.bg_unlocked['bg1'] else 'Gekocht'
-                bold: True
-                background_color: 0, 0, 0, 0
-                pos: self.pos
-                size_hint: None, None
-                size: 360/1.5, 640/8
-                canvas.before:
-                    Color:
-                        rgba: 0,.7,.7,1
-                    RoundedRectangle:
-                        pos: self.pos
-                        size: self.size
-
-            Button:
-                id: buy_btn2
-                disabled: False if not root.bg_unlocked['bg2'] else True
-                text: root.price_str if not root.bg_unlocked['bg2'] else 'Gekocht'
-                bold: True
-                on_press: root.current_bg = 2; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
-                on_release: root.background_change()
-                background_color: 0, 0, 0, 0
-                pos: self.pos
-                size_hint: None, None
-                size: 360/1.5, 640/8
-                canvas.before:
-                    Color:
-                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
-                    RoundedRectangle:
-                        pos: self.pos
-                        size: self.size
-
-            Button:
-                id: buy_btn3
-                disabled: False if not root.bg_unlocked['bg3'] else True
-                text: root.price_str if not root.bg_unlocked['bg3'] else 'Gekocht'
-                bold: True
-                on_press: root.current_bg = 3; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
-                on_release: root.background_change()
-                background_color: 0, 0, 0, 0
-                pos: self.pos
-                size_hint: None, None
-                size: 360/1.5, 640/8
-                canvas.before:
-                    Color:
-                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
-                    RoundedRectangle:
-                        pos: self.pos
-                        size: self.size
+#    ScrollView:
+#        id: bg_scrollview
+#        do_scroll_x: True
+#        do_scroll_y: False
+#        pos: root.width, root.height
+#        GridLayout:
+#            cols: 3
+#            rows: 2
+#            padding: 135, 75, 135 ,75
+#            spacing: 165, 25
+#            size_hint_y: None
+#            height: self.minimum_height
+#            size_hint_x: None
+#            width: self.minimum_width
+#            Button:
+#                id: bg_btn1
+#                bg_number: 1
+#                on_press: root.current_bg = 1 #root.test() ; self.disabled = True; bg2.disabled = False
+#                on_release: root.background_change(); root.selected = 0
+#                font_size: 32
+#                size: 360/1.5, 640/1.5
+#                size_hint: None, None
+#                pos: root.width/4, root.height/6
+#                background_color: 0, 0, 0, 0
+#                canvas.before:
+#                    Color:
+#                        rgba: (1,1,1,1)# if root.bg != 'resources/backgrounds/wallpaper.png' else (0, .7, .7, .7)
+#                    RoundedRectangle:
+#                        size: self.width, self.height
+#                        pos: self.pos
+#                        source: root.data.backgrounds[1]
+#
+#            Button:
+#                id: bg_btn2
+#                disabled: True if not root.bg_unlocked['bg2'] else False
+#                color: 1, 1, 1, 1
+#                on_press: root.current_bg = 2
+#                on_release: root.background_change(); root.selected = 0
+#                font_size: 30
+#                size: 360/1.5, 640/1.5
+#                size_hint: None, None
+#                pos: root.width/4, root.height/6
+#                background_color: 0, 0, 0, 0
+#                canvas.before:
+#                    Color:
+#                        rgba: (1,1,1,1)# if bg_btn2.disabled==False else (1,1,1, .5)
+#                    RoundedRectangle:
+#                        size: self.width, self.height
+#                        pos: self.pos
+#                        source: root.data.backgrounds[2]
+#                canvas.after:
+#                    Color:
+#                        rgba: (1,1,1,0) if bg_btn2.disabled==False else (115/255,115/255,115/255, .9)
+#                    RoundedRectangle:
+#                        size: self.width, self.height
+#                        pos: self.pos
+#
+#            Button:
+#                id: bg_btn3
+#                disabled: True if not root.bg_unlocked['bg3'] else False
+#                color: 1, 1, 1, 1
+#                on_press: root.current_bg = 3# root.test()#; self.disabled = True; bg1.disabled = False
+#                on_release: root.background_change(); root.selected = 0
+#                font_size: 30
+#                size: 360/1.5, 640/1.5
+#                size_hint: None, None
+#                pos: root.width/4, root.height/6
+#                background_color: 0, 0, 0, 0
+#                canvas.before:
+#                    Color:
+#                        rgba: (1,1,1,1) #if bg_btn3.disabled==False else (1,1,1, .3)
+#                    RoundedRectangle:
+#                        size: self.width, self.height
+#                        pos: self.pos
+#                        source: root.data.backgrounds[3]
+#                canvas.after:
+#                    Color:
+#                        rgba: (1,1,1,0) if bg_btn3.disabled==False else (115/255,115/255,115/255, .9)
+#                    RoundedRectangle:
+#                        size: self.width, self.height
+#                        pos: self.pos
+#
+#            Button:
+#                id: buy_btn1
+#                disabled: True
+#                text: root.price_str if not root.bg_unlocked['bg1'] else 'Gekocht'
+#                bold: True
+#                background_color: 0, 0, 0, 0
+#                pos: self.pos
+#                size_hint: None, None
+#                size: 360/1.5, 640/8
+#                canvas.before:
+#                    Color:
+#                        rgba: 0,.7,.7,1
+#                    RoundedRectangle:
+#                        pos: self.pos
+#                        size: self.size
+#
+#            Button:
+#                id: buy_btn2
+#                disabled: False if not root.bg_unlocked['bg2'] else True
+#                text: root.price_str if not root.bg_unlocked['bg2'] else 'Gekocht'
+#                bold: True
+#                on_press: root.current_bg = 2; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
+#                on_release: root.background_change()
+#                background_color: 0, 0, 0, 0
+#                pos: self.pos
+#                size_hint: None, None
+#                size: 360/1.5, 640/8
+#                canvas.before:
+#                    Color:
+#                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
+#                    RoundedRectangle:
+#                        pos: self.pos
+#                        size: self.size
+#
+#            Button:
+#                id: buy_btn3
+#                disabled: False if not root.bg_unlocked['bg3'] else True
+#                text: root.price_str if not root.bg_unlocked['bg3'] else 'Gekocht'
+#                bold: True
+#                on_press: root.current_bg = 3; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
+#                on_release: root.background_change()
+#                background_color: 0, 0, 0, 0
+#                pos: self.pos
+#                size_hint: None, None
+#                size: 360/1.5, 640/8
+#                canvas.before:
+#                    Color:
+#                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
+#                    RoundedRectangle:
+#                        pos: self.pos
+#                        size: self.size
 
 
 <PopupOutfit@Popup>:
     size_hint_y: .5
     size_hint_x: .8
     kh: app.root.ids.kh
-    title: ('KaruCoins: ' + str(round(self.kh.wallet)))
+    title: ''#('KaruCoins: ' + str(round(self.wallet)))
 
     BoxLayout:
         spacing: 15
@@ -398,8 +465,7 @@
             source: self.bg
     name: "second"
 
-
-    karulabel: karulabel
+    #karulabel: karulabel
     highscore_label: highscore_label
     wallet_label: wallet_label
 
@@ -418,6 +484,13 @@
     letterBtn10: LetterBtn10
     letterBtn11: LetterBtn11
     letterBtn12: LetterBtn12
+    letterBtn13: LetterBtn13
+    letterBtn14: LetterBtn14
+    letterBtn15: LetterBtn15
+    letterBtn16: LetterBtn16
+    letterBtn17: LetterBtn17
+    letterBtn18: LetterBtn18
+    letterBtn19: LetterBtn19
 
     next_button: next_button
 
@@ -425,6 +498,7 @@
     start_btn: start_btn
 
     imagewidget: imagewidget
+    mainlanglabel: mainlanglabel
 
     i: 0
 
@@ -435,7 +509,7 @@
             rgba: ((249/255), (193/255), (109/255), .8)
         RoundedRectangle:
             pos: root.width/1.3, root.height/1.15
-            size: root.width/3, root.height/9
+            size: root.width/5, root.height/9
 
     Label:
         pos_hint: {'x': .868, 'y': .938}
@@ -477,12 +551,17 @@
         pos_hint: {'center_x': .82, 'center_y': .893}
         source: 'resources/icons/crown.png'
 
-
+    Label:
+        id: mainlanglabel
+        text: ''
+        bold: True
+        font_size: 36
+        pos_hint: {'center_x': .5, 'center_y': .82}
     Image:
         id: imagewidget
         source: AmbonWidget.currentImage
         opacity: 0
-        size_hint: .5, .5
+        size_hint: .4, .25
         pos_hint: {'center_x': .5, 'center_y': .65}
         canvas.before:
             Color:
@@ -496,31 +575,56 @@
         color: 0, 0, 0, 0
         background_color: 0, 0, 0, 0
         on_press: AmbonWidget.help()
-        size_hint: .7, .175
-        pos_hint: {"center_x": .5, "center_y": .125}
-
-
-    Label:
-        id: karulabel
-        color: 1,1,1
-        text: AmbonWidget.karu.speech
-        multiline: True
-        bold: True
-        font_size: 30 #root.width*.045
-        text_size: self.size
-        size_hint: .4, .175
-        pos_hint:{"center_x": .6, "center_y": .2}
+        on_release: AmbonWidget.wordChecker()
+        size_hint: .125, .075
+        pos_hint: {"center_x": .4, "center_y": .125}
         canvas.before:
             Color:
-                rgba: ((249/255), (193/255), (109/255), .8) if help_button.state=='normal' else (AmbonWidget.secondary_color2)
+                rgba: (1, 1, 1, 1) if self.state=='normal' else (AmbonWidget.secondary_color2)
             RoundedRectangle:
                 size: help_button.size
                 pos: help_button.pos
+                source: 'resources/icons/suggestion.png'
 
-    Image:
-        source: 'resources/karu/karu.png'
-        size_hint: .2, .2
-        pos_hint:{"center_x":.27, "center_y":.125}
+    Button: # Sound Button
+        id: sound_button
+        color: 0, 0, 0, 0
+        background_color: 0, 0, 0, 0
+        clicked: 0
+        on_press: AmbonWidget.play_sound()
+        size_hint: .12, .07
+        pos_hint: {"center_x": .6, "center_y": .12}
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1) if self.state=='normal' else (AmbonWidget.secondary_color2)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                source: 'resources/icons/sound.png'
+#        canvas.after:
+#            Color:
+#                rgba: 1, 1, 1, 1
+#            RoundedRectangle:
+#                size: help_button.size
+#                pos: help_button.pos
+#                source: 'resources/icons/suggestion.png'
+#
+
+#    Label:
+#        id: karulabel
+#        color: 1,1,1
+#        text: AmbonWidget.karu.speech
+#        multiline: True
+#        bold: True
+#        font_size: 30 #root.width*.045
+#        text_size: self.size
+#        size_hint: .4, .175
+#        pos_hint:{"center_x": .6, "center_y": .2}
+#
+#    Image:
+#        source: 'resources/karu/karu.png'
+#        size_hint: .2, .2
+#        pos_hint:{"center_x":.27, "center_y":.125}
 
 
 
@@ -529,85 +633,127 @@
         cols: 6
         spacing: 15, 30
         size_hint: .5, .15
-        pos_hint:{"center_x":.5, "center_y":.3}
+        pos_hint:{"center_x":.5, "center_y":.32}
 
         LetterButton:
             id: LetterBtn1
             text:
             bold: True
-            on_press: AmbonWidget.i = 0; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 0; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn2
             text:
             bold: True
-            on_press: AmbonWidget.i = 1; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 1; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn3
             text:
             bold: True
-            on_press: AmbonWidget.i = 2; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 2; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn4
             text:
             bold: True
-            on_press: AmbonWidget.i = 3; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 3; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn5
             text:
             bold: True
-            on_press: AmbonWidget.i = 4; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 4; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn6
             text:
             bold: True
-            on_press: AmbonWidget.i = 5; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 5; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn7
             text:
             bold: True
-            on_press: AmbonWidget.i = 6; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 6; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn8
             text:
             bold: True
-            on_press: AmbonWidget.i = 7; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 7; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn9
             text:
             bold: True
-            on_press: AmbonWidget.i = 8; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 8; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn10
             text:
             bold: True
-            on_press: AmbonWidget.i = 9; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 9; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn11
             text:
             bold: True
-            on_press: AmbonWidget.i = 10; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 10; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
         LetterButton:
             id: LetterBtn12
             text:
             bold: True
-            on_press: AmbonWidget.i = 11; AmbonWidget.typeWord()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 11; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn13
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 12; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn14
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 13; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn15
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 14; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn16
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 15; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn17
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 16; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn18
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 17; AmbonWidget.typeWord()
+            on_release: AmbonWidget.wordChecker()
+        LetterButton:
+            id: LetterBtn19
+            text:
+            bold: True
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 18; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
     Button:
         id: next_button
         text: '>'
         opacity: 0
-        on_press: AmbonWidget.words()
+        on_press: AmbonWidget.click_button(); AmbonWidget.words()
         size_hint: .2, .05
         pos_hint:{"center_x":.5, "center_y":.3}
         color: (.0,.0,.0,.0) if self.disabled else (1,1,1,1)
@@ -620,7 +766,7 @@
                 size: self.size
     Button:
         id: menupop
-        on_press: AmbonWidget.game_pause = True; AmbonWidget.pause_time(); Factory.PopupMenu().open()
+        on_press: AmbonWidget.click_button(); AmbonWidget.game_pause = True; AmbonWidget.pause_time(); Factory.PopupMenu().open()
         on_release: print(AmbonWidget.game_pause)
         background_color: 0,0,0,0
         size_hint: .1, .05

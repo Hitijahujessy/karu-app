@@ -1,10 +1,12 @@
 # Using kivy 2.0.0 and python3.8
 
+import os
 import kivy
 
 from kivy.config import Config  # For setting height (19.5:9)
 from kivy.factory import Factory
 from kivy.graphics import Rectangle, RoundedRectangle, Color, InstructionGroup
+from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 
 from kivy.app import App
@@ -12,9 +14,13 @@ from kivy.lang import Builder
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
+from kivy.core.audio import SoundLoader
+
 
 from kivy.properties import NumericProperty, ObjectProperty, BooleanProperty
 from kivy.clock import Clock  # For retrieving playtime and getting score
@@ -26,10 +32,12 @@ import packData
 import karuData
 
 kivy.require('2.0.0')  # Version of Kivy
+#os.environ["KIVY_AUDIO"] = "sdl12" #audio_ffpyplayer, audio_sdl2 (audio_gstplayer, audio_avplayer ignored)
 Config.set('graphics', 'width', '360')  # (New Android smartphones e.g. OnePlus 7 series)
 Config.set('graphics', 'height', '640')  # (iPhone X, 11 and 12 series, upsampled)
 store = JsonStore('resources/user_data.json')  # For saving high score
 root_widget = Builder.load_file('layout.kv')
+
 
 # os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'  # If necessary, uncomment to prevent OpenGL error
 
@@ -42,7 +50,7 @@ class KaruWidget(Widget):
 
 class GameWidget(Screen, FloatLayout):
     karu = KaruWidget()
-    karulabel = ObjectProperty(None)
+    # click_sound = SoundLoader.load('resources/Sounds/click_button.wav')
 
     time = NumericProperty()  # Time taken per image
 
@@ -79,6 +87,13 @@ class GameWidget(Screen, FloatLayout):
     letterBtn10 = ObjectProperty(None)
     letterBtn11 = ObjectProperty(None)
     letterBtn12 = ObjectProperty(None)
+    letterBtn13 = ObjectProperty(None)
+    letterBtn14 = ObjectProperty(None)
+    letterBtn15 = ObjectProperty(None)
+    letterBtn16 = ObjectProperty(None)
+    letterBtn17 = ObjectProperty(None)
+    letterBtn18 = ObjectProperty(None)
+    letterBtn18 = ObjectProperty(None)
 
     # Button to go to next level if level_finish == True
     next_button = ObjectProperty(None)
@@ -104,7 +119,8 @@ class GameWidget(Screen, FloatLayout):
 
     # import module packData, containing image's and corresponding words, also randomize index for variation
     data = packData
-    wordlist = data.pack1  # Current list of words
+    originlist = data.pack_origin
+    wordlist = data.pack_dest  # Current list of words
     indexlist = list(wordlist.keys())  # Index current word
     print(indexlist)
     random.shuffle(indexlist)
@@ -114,9 +130,13 @@ class GameWidget(Screen, FloatLayout):
 
     # Word for current level
     currentWord = wordlist[index]
+    currentWordOrigin = originlist[index]
+    word = ''
 
     # Image for current level
-    currentImage = data.pack1img[index]
+    currentImage = data.pack_img[index]
+
+    mainlanglabel = ObjectProperty()
 
     # Used to assign letters to buttons
     letters_btn = currentWord
@@ -149,10 +169,8 @@ class GameWidget(Screen, FloatLayout):
         # Check if level is cleared
         if self.level_finish:
 
-            if self.hints <= 0:
-                self.karulabel.text = self.karu.data.nohints
-            else:
-                self.karulabel.text = self.karu.data.starttext
+            if self.hints >=1:
+
                 self.help_button.disabled = False
 
             self.level_finish = False  # New level started, level finish = false
@@ -162,14 +180,14 @@ class GameWidget(Screen, FloatLayout):
             self.mistakes = 0
 
             self.currentWord = self.wordlist[self.index]  # New word
-            self.currentImage = self.data.pack1img[self.index]  # Corresponding image
+            self.currentImage = self.data.pack_img[self.index]  # Corresponding image
+            self.currentWordOrigin = self.originlist[self.index]
+            self.mainlanglabel.text = self.currentWordOrigin
             self.emptyspace = ('_' * len(self.currentWord))  # Set empty space ('-') to len(currentWord)
 
             # Clear answer label
 
             self.letters_btn = self.currentWord
-
-
 
             self.imagewidget.source = self.currentImage
             print(self.currentWord)  # Test if currentWord is updated
@@ -181,7 +199,6 @@ class GameWidget(Screen, FloatLayout):
     # Function for randomizing letters for buttons
     def randomizeLetters(self):
 
-
         if not self.grid_exist:
             self.grid = GridLayout(rows=1, cols=len(self.currentWord), spacing=10, size_hint_x=.55, size_hint_y=.075,
                                    pos_hint={'center_x': .5, 'center_y': .45})
@@ -192,12 +209,12 @@ class GameWidget(Screen, FloatLayout):
             self.answer_to_check = []
             self.wordbuttons = []
             self.charloc = 0
-
+            self.grid.clear_widgets(children=None)
             self.remove_widget(self.grid)
             self.grid = GridLayout(rows=1, cols=len(self.currentWord), spacing=10, size_hint_x=.55, size_hint_y=.075,
                                    pos_hint={'center_x': .5, 'center_y': .45})
             self.add_widget(self.grid)
-            self.grid.clear_widgets(children=None)
+
             print('grid cleared')
 
         self.start_time()
@@ -206,27 +223,41 @@ class GameWidget(Screen, FloatLayout):
         self.imagewidget.opacity = 1
 
         all_letters = list("abcdefghijklmnopqrstuvwxyz")  # Possible letters for randomizing
-        letters_needed = 12 - len(
-            self.currentWord)  # 12 letters are needed in total, X letters already exist in current Word
+        self.word = self.currentWord
+
+        if ' ' in self.word:
+            self.word = self.word.replace(' ', '')
+            print('space removed')
+        else:
+            print('No space in word')
+
+        self.word = "".join(set(self.word.lower()))
+
+        self.letters_btn = self.word
+
+        letters_needed = 19 - len(
+            self.word)  # 18 letters are needed in total, X letters already exist in current Word
         # Turn all letterBtn variables into a list for efficiency
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
-                     self.letterBtn11, self.letterBtn12]
+                     self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
 
         # turn button opacity to 1
-        for x in range(12):
+        for x in range(18):
             letterBtn[x].opacity = 1
         # Add possible characters to list including currentWord
         for x in range(letters_needed):
 
             while True:
                 # letters_btn length may not exceed 12
-                if len(self.letters_btn) != 12:
+                if len(self.letters_btn) != 18:
 
                     add_letter = random.choice(all_letters)  # Choose random letter from all_letters
 
-                    if add_letter not in self.letters_btn:
+                    if add_letter not in self.letters_btn and add_letter not in self.word:
                         self.letters_btn += add_letter  # Append chosen letter to letters_btn
+                        print(self.letters_btn)
                         break
 
                     else:
@@ -247,16 +278,17 @@ class GameWidget(Screen, FloatLayout):
         self.letters_btn = self.letters_btn.upper()
 
         # Assign characters to buttons
-        for x in range(12):
+        for x in range(len(self.letters_btn)):
             letterBtn[x].text = self.letters_btn[x]
 
         for x in range(len(self.currentWord)):
             word_button = Factory.WordButton()
             self.grid.add_widget(word_button)
             word_button.charpos = x
+            if self.currentWord[x] == ' ':
+                word_button.text = ' '
+                word_button.disabled = True
             self.wordbuttons.append(word_button)
-
-
 
     # Function for typing words
     def typeWord(self):
@@ -269,7 +301,8 @@ class GameWidget(Screen, FloatLayout):
         # Turn all letterBtn variables into a list for efficiency
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
-                     self.letterBtn11, self.letterBtn12]
+                     self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
 
         # Get amount of characters in 'answer' label for iteration
         wordlength = len(self.emptyspace)
@@ -285,9 +318,15 @@ class GameWidget(Screen, FloatLayout):
             # Check if current character is '-', if yes, replace with letter on pressed button
             if self.wordbuttons[x].text == '_':
 
-                # Replace current '-' with button text
-                self.wordbuttons[x].text = letterBtn[self.i].text
-                self.wordbuttons[x].state = 'normal'
+                if self.currentWord[x] == ' ':
+                    self.wordbuttons[x].text = ' '
+                    self.wordbuttons[x].disabled = True
+                    self.wordbuttons[x+1].text = letterBtn[self.i].text
+                    self.wordbuttons[x+1].state = 'normal'
+                # Replace current '_' with button text
+                else:
+                    self.wordbuttons[x].text = letterBtn[self.i].text
+                    self.wordbuttons[x].state = 'normal'
 
                 break
 
@@ -310,26 +349,12 @@ class GameWidget(Screen, FloatLayout):
 
             print(self.charloc)
 
-        # labeltext = list(self.emptyspace)
-        # labeltext[self.charloc] = '_'
-        #
-        # # Turn list in string so it can be used in 'answer' label
-        # labeltext = ''.join(map(str, labeltext))
-        #
-        # # Update label and emptyspace
-        # self.emptyspace = labeltext
-        #
-        # if self.charloc != 0:
-        #     self.charloc -= 1
-
     def help(self):
 
         self.hints_used += 1
+        self.hints = 500
 
-        if self.hints <= 0:
-            self.karulabel.text = self.karu.data.nohints
-        else:
-            self.karulabel.text = self.karu.data.starttext
+        if self.hints >= 1:
             self.help_button.disabled = False
 
         labeltext = list(self.emptyspace)
@@ -338,31 +363,27 @@ class GameWidget(Screen, FloatLayout):
         # Turn all letterBtn variables into a list for efficiency
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
-                     self.letterBtn11, self.letterBtn12]
+                     self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
 
         for x in range(wordlength):
 
             # Check if current character is '-', if yes, replace with letter on pressed button
-            if labeltext[x] == '_':
+            if self.wordbuttons[x].text == '_':
+                self.wordbuttons[x].text = self.currentWord[x].upper()
+                self.wordbuttons[x].disabled = True
+                self.wordbuttons[x].color = (0, .4, 1, 1)
 
-                for i in range(1, 12):
+                self.hints -= 1
+                print(self.hints)
 
-                    if letterBtn[i].text == list(self.currentWord)[x].upper():
-                        # Replace current '-' with button text
-                        letterBtn[i].state = 'down'
-                        self.help_button.disabled = True
-                        continue
-
-                    else:
-                        continue
-
-                if self.charloc != (len(labeltext) - 1):
-                    self.hints -= 1
-                    print(self.hints)
                 if self.hints <= 0:
-                    self.karulabel.text = self.karu.data.nohints
-                    print(self.karulabel.text)
                     self.help_button.disabled = True
+
+                # if '_' not in self.wordbuttons[(wordlength-1)].text:
+                #     self.wordChecker()
+
+
 
                 break
 
@@ -372,7 +393,49 @@ class GameWidget(Screen, FloatLayout):
 
         print('help')
 
-    # Function to check if entry is correct
+
+    def victory_sound(self):
+
+        press_sound = None
+        file = 'resources/Sounds/correct.wav'
+        press_sound = SoundLoader.load(file)
+
+        press_sound.volume = .8
+        press_sound.play()
+
+    def incorrect_sound(self):
+
+        press_sound = None
+        file = 'resources/Sounds/incorrect.wav'
+        press_sound = SoundLoader.load(file)
+
+        press_sound.volume = .8
+        press_sound.play()
+
+    def play_sound(self):
+
+        file = 'resources/Sounds/langsambonese/' + self.currentWord + '.wav'
+
+        click_sound = SoundLoader.load(file)
+
+        click_sound.volume = .8
+        click_sound.play()
+
+        click_sound = SoundLoader.load('')
+
+    def play_click_button_sound(self, interval):
+
+        press_sound = None
+        file = 'resources/Sounds/click_button.wav'
+        press_sound = SoundLoader.load(file)
+
+        press_sound.volume = .8
+        press_sound.play()
+
+    def click_button(self):
+
+        Clock.schedule_once(self.play_click_button_sound, -2)
+
     def wordChecker(self):
 
         self.answer_to_check = []
@@ -381,7 +444,7 @@ class GameWidget(Screen, FloatLayout):
             self.answer_to_check.append(self.wordbuttons[x].text)
 
         self.answer_to_check = ''.join([str(elem) for elem in self.answer_to_check])
-        print(self.answer_to_check)
+        print('answ to check: ', self.answer_to_check)
 
         # Check if '-' exists in label, if yes, level is not finished. If '-' does not exist, check if answer is correct
         if '_' in self.answer_to_check:
@@ -391,28 +454,38 @@ class GameWidget(Screen, FloatLayout):
         else:
 
             # if True, answer is correct and level is finished
-            if self.answer_to_check.lower() == self.currentWord:
+            if self.answer_to_check.lower() == self.currentWord.lower():
+
 
                 self.level += 1
 
                 if self.level < len(self.indexlist):
+
                     self.index = self.indexlist[self.level]  # Index +1 to go to next word
                     # self.answer.color = .021, .4, .006, 1
                     self.level_finish = True  # Level is finished
                     self.stop_game()  # Time is stopped to get score
-                    self.add_widget(self.next_button)
+                    try:
+                        self.add_widget(self.next_button)
+                    except kivy.uix.widget.WidgetException:
+                        print(
+                            "kivy.uix.widget.WidgetException: Cannot add <kivy.uix.button.Button object at 0x7fb802ff30b0>, it already has a parent <Screen name='second'")
 
                     self.next_button.opacity = 1
-                    self.karulabel.text = (self.karu.data.correcttext + '\n+%s KaruCoins!' % round(self.coins))
+                    self.victory_sound()
+                    time.sleep(.8)
+                    self.play_sound()
 
                     # remove buttons for cleaner look
 
                     # Turn all letterBtn variables into a list for efficiency
                     letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                                  self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
-                                 self.letterBtn11, self.letterBtn12]
+                                 self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14,
+                                 self.letterBtn15,
+                                 self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
 
-                    for x in range(12):
+                    for x in range(len(letterBtn)):
                         try:
                             letterBtn[x].opacity = 0
                         except Exception as e:
@@ -422,22 +495,21 @@ class GameWidget(Screen, FloatLayout):
                 elif self.level >= len(self.indexlist):
                     self.game_finish = True
                     self.stop_game()
-                    self.karulabel.text = (self.karu.data.correcttext + '\n+%s KaruCoins!' % round(self.coins))
+
                     # self.answer.color = .021, .4, .006, 1
 
             # Answer incorrect, change 'answer' label back to emptyspace
             else:
 
-                self.karulabel.text = self.karu.data.incorrecttext
+                self.incorrect_sound()
                 time.sleep(.5)
                 self.emptyspace = ('_' * len(self.currentWord))
 
                 for x in range(len(self.wordbuttons)):
                     self.wordbuttons[x].text = '_'
+                    self.wordbuttons[x].color = (1, 1, 1, 1)
 
                 self.mistakes += 1
-
-
 
     # To increase the time / count
     def increment_time(self, interval):
@@ -548,7 +620,6 @@ class GameWidget(Screen, FloatLayout):
             self.wallet += round(self.coins_total)
             store.put("wallet", coins=self.wallet)
             self.wallet = store.get("wallet")["coins"]
-            self.wallet_label.text = (str(round(self.wallet)) + 'KC')
             print("Wallet: %s" % self.wallet)
 
     def high_score(self):
@@ -578,17 +649,22 @@ class GameWidget(Screen, FloatLayout):
 
         # WORDS Function #
 
-        # import module packData, containing image's and corresponding words
-        self.indexlist = [0, 1, 2, 3, 4]  # Index current word
-        random.shuffle(self.indexlist)
-        self.level = 0
-        self.index = self.indexlist[self.level]
+        # import module packData, containing image's and corresponding words, also randomize index for variation
+        originlist = self.data.pack_origin
+        wordlist = self.data.pack_dest  # Current list of words
+        indexlist = list(wordlist.keys())  # Index current word
+        print(indexlist)
+        random.shuffle(indexlist)
+        print(indexlist)
+        level = 0
+        index = indexlist[level]
 
         # Word for current level
-        self.currentWord = self.wordlist[self.index]
+        currentWord = wordlist[index]
+        currentWordOrigin = originlist[index]
 
         # Image for current level
-        self.currentImage = self.data.pack1img[self.index]
+        currentImage = self.data.pack_img[index]
 
         # Used to assign letters to buttons
         self.letters_btn = self.currentWord
@@ -614,11 +690,6 @@ class GameWidget(Screen, FloatLayout):
 
         try:
             self.imagewidget.source = self.currentImage
-        except AttributeError:
-            print(AttributeError)
-
-        try:
-            self.karulabel.text = karuData.starttext
         except AttributeError:
             print(AttributeError)
 
@@ -665,174 +736,163 @@ class GameWidget(Screen, FloatLayout):
             self.remove_widget(self.start_btn)
 
         elif self.game_finish:
-            print('happening fam')
             self.stop_time()
 
 
 class Menu(Screen, BoxLayout):
-    wallet = store.get("wallet")["coins"]
+    wallet = NumericProperty(store.get('wallet')['coins'])
     highscore = NumericProperty(store.get('data')['highscore'])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_interval(self.update_vars, .5)
+
+    def update_vars(self, dt):
+        self.wallet = store.get('wallet')['coins']
+        self.highscore = store.get('data')['highscore']
 
 
 class PopupBg(Popup):
-    bg = store.get('custom')['current_bg']
-    packData = packData
-    bg_unlocked = store.get('backgrounds')['unlocked']
-    bg_price = store.get('backgrounds')['price']
 
-    selected = 0  # View currently selected background
-    selection_rects = []
-
+    backgroundnumber = 1
+    backgroundnumber_buy = 1
     current_bg = 1
-    bg_index = 'bg' + str(current_bg)
 
-    bg_btn1 = ObjectProperty(None)
+    bg = store.get('custom')['current_bg']
 
-    bg_btn2 = ObjectProperty(None)
-    buy_btn2 = ObjectProperty(None)
+    bg_unlocked = store.get('backgrounds')
 
-    bg_btn3 = ObjectProperty(None)
-    buy_btn3 = ObjectProperty(None)
+    bg_index = 'bg' + str(backgroundnumber)
 
-    bg_btn = [None, bg_btn1, bg_btn2, bg_btn3]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    price = ObjectProperty(0)
-    price_str = str(bg_price) + 'KC'
+        bg_scrollview = ScrollView(do_scroll_y=True, do_scroll_x=False)
+
+        data = packData
+
+        selected = 0  # View currently selected background
+        selection_rects = []
+
+        bg_buttons = []
+        bg_buy_buttons = []
+
+        bg_grid = GridLayout(rows=(len(data.backgrounds)), cols=3, size_hint_x=1, size_hint_y=None,
+                             pos_hint={'center_x': .5, 'center_y': .5}, spacing=(25, 25), padding=(50, 50, 50, 50))
+        bg_grid.bind(minimum_height=bg_grid.setter('height'))
+        bg_scrollview.add_widget(bg_grid)
+        obj = InstructionGroup()
+
+
+        backgroundnumber_buy = 1
+        bg_index = 'bg' + str(self.backgroundnumber)
+        bg_buy_index = 'bg' + str(backgroundnumber_buy)
+
+        backgrounddict = {}  # used for bg_unlocked in json file
+
+        for x in range(int(len(data.backgrounds) / 3)):
+
+            for i in range(3):
+                bg_button = Factory.BackgroundButton()
+
+                bg_grid.add_widget(bg_button)
+                bg_button.backgroundnumber = self.backgroundnumber
+                bg_button.bind(on_press=lambda j: self.change_bg_value())
+                #bg_button.bind(on_release=lambda x: self.background_change)
+
+                bg_buttons.append(bg_button)
+
+                backgrounddict[bg_index] = False
+
+                self.backgroundnumber += 1
+                bg_index = 'bg' + str(self.backgroundnumber)
+
+            for x in range(3):
+                bg_buy_button = Factory.BuyButton()
+                bg_grid.add_widget(bg_buy_button)
+
+                bg_buy_button.backgroundnumber_buy = self.backgroundnumber_buy
+                bg_buy_button.bind(on_press=lambda j: self.checkout())
+                bg_buy_buttons.append(bg_buy_button)
+
+                self.backgroundnumber_buy += 1
+
+        if len(self.bg_unlocked) != len(data.backgrounds):
+            store.put('backgrounds', unlocked=backgrounddict)
+
+        self.add_widget(bg_scrollview)
+        print(self.bg_unlocked)
+
+        # Loop to check which backgrounds are unlocked, so the buttons can be enabled and disabled where needed
+        self.backgroundnumber = 1
+        for x in range(len(bg_buttons)):
+            try:
+                bg_index = 'bg' + str(self.backgroundnumber)
+                if self.bg_unlocked[bg_index]:
+                    bg_buttons[x].remove_widget(bg_buttons[x].ids.lock_img)  # Remove lock button and img
+                    bg_buttons[x].remove_widget(bg_buttons[x].ids.lock_button)
+                    bg_buy_buttons[x].disabled = True  # BuyButton also has to be disabled and the coin_icon should be
+                    bg_buy_buttons[x].text = ''  # replaced with a check icon
+
+                self.backgroundnumber += 1
+            except Exception as e:
+                print(repr(e))
+
+    price = 250
 
     wallet = store.get("wallet")["coins"]
     print(wallet)
 
-    # Function to ensure buttons are disabled/enabled where need to
-    def update(self, dt):
+    def change_bg_value(self):
 
-        if store['backgrounds']['unlocked']['bg2']:
-            self.buy_btn2.disabled = True
-            self.bg_btn2.disabled = False
-            self.buy_btn2.text = 'Gekocht'
-            print('bg2')
+        for x in range(len(self.bg_buttons)):
+            if self.data[x] == self.bg_buttons[x].backgroundnumber:
+                self.current_bg = self.bg_buttons[x].backgroundnumber
+                store.put("custom", current_bg=self.bg_buttons[x].source)
+                print('works')
 
-        if store['backgrounds']['unlocked']['bg3']:
-            self.buy_btn3.disabled = True
-            self.bg_btn2.disabled = False
-            self.buy_btn3.text = 'Gekocht'
-            print('bg3')
 
-        if store.get('custom')['current_bg'] == 'resources/backgrounds/wallpaper.png':
-
-            if self.selected == 0:
-
-                self.selected = 1
-
-                if len(self.selection_rects) != 0:
-                    item = self.selection_rects.pop(-1)
-                    try:
-                        self.bg_btn1.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn2.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn3.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-
-                self.obj = InstructionGroup()
-                self.obj.add(Color(0, .7, .7, .7))
-                self.obj.add(RoundedRectangle(size=self.bg_btn1.size, pos=self.bg_btn1.pos))
-                self.selection_rects.append(self.obj)
-                self.bg_btn1.canvas.before.add(self.obj)
-
-        if store.get('custom')['current_bg'] == 'resources/backgrounds/wallpaper2.png':
-
-            if self.selected == 0:
-
-                self.selected = 1
-
-                if len(self.selection_rects) != 0:
-                    item = self.selection_rects.pop(-1)
-                    try:
-                        self.bg_btn1.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn2.canvas.before.remove(item)
-                        self.bg_btn2.text = ''
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn3.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-
-                self.obj = InstructionGroup()
-                self.obj.add(Color(0, .7, .7, .7))
-                self.obj.add(RoundedRectangle(size=self.bg_btn2.size, pos=self.bg_btn2.pos))
-                self.selection_rects.append(self.obj)
-                self.bg_btn2.canvas.before.add(self.obj)
-
-        if store.get('custom')['current_bg'] == 'resources/backgrounds/wallpaper3.png':
-
-            if self.selected == 0:
-
-                self.selected = 1
-
-                if len(self.selection_rects) != 0:
-                    item = self.selection_rects.pop(-1)
-                    try:
-                        self.bg_btn1.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn2.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-                    try:
-                        self.bg_btn3.canvas.before.remove(item)
-                    except ValueError:
-                        print('nothing to remove')
-
-                self.obj = InstructionGroup()
-                self.obj.add(Color(0, .7, .7, .7))
-                self.obj.add(RoundedRectangle(size=self.bg_btn3.size, pos=self.bg_btn3.pos))
-                self.selection_rects.append(self.obj)
-                self.bg_btn3.canvas.before.add(self.obj)
-
+                break
+            else:
+                continue
     def checkout(self):
+
+        print('checkout')
 
         if self.price <= self.wallet:
 
+            bg_buy_index = 'bg' + str(self.backgroundnumber_buy)
+            print(bg_buy_index)
+
             print("Kaching!")
-            self.wallet = self.wallet - self.bg_price
+            self.wallet = self.wallet - self.price
             print('current wallet: ', self.wallet)
             store.put("wallet", coins=self.wallet)
 
-            store['backgrounds']['unlocked'][self.bg_index] = True
+            store['backgrounds'][self.bg_index] = True
 
             self.title = ('KaruCoins: ' + str(round(self.wallet)))
 
-            # self.bg_btn[self.current_bg].text = ''
 
-            # self.background_change()
+
+
         else:
             print("Not enough coins")
 
     def background_change(self):
 
+        self.current_bg = self.bg_button.backgroundnumber
+
         self.bg_index = 'bg' + str(self.current_bg)
 
-        if self.bg_unlocked[self.bg_index]:
 
-            store.put("custom", current_bg=self.packData.backgrounds[self.current_bg])
 
-            print("click")
-            Clock.schedule_once(self.update, -1)
+        # self.current_bg = self.backgroundnumber
 
-        elif not self.bg_unlocked[self.bg_index]:
+        store.put("custom", current_bg=packData.backgrounds[self.current_bg])
 
-            print("Not bought")
-            self.checkout()
+        print("click")
+
 
             # if self.bg_unlocked[self.bg_index]:
             #
@@ -859,6 +919,7 @@ class PopupBg(Popup):
         #         store.put("custom", current_bg="resources/backgrounds/wallpaper2.png")
         #         WindowManager.bg = "resources/backgrounds/wallpaper2.png"
 
+
 class KaruHouse(Screen, BoxLayout):
     pass
 
@@ -883,7 +944,6 @@ class WindowManager(ScreenManager):
 
 class KaruApp(App):
     WindowManager = WindowManager()
-
 
     def build(self):
         self.icon = 'resources/icons/karuicon.png'
