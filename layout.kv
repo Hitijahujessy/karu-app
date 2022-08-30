@@ -2,6 +2,8 @@
 #: import WipeTransition kivy.uix.screenmanager.WipeTransition
 #:import hex kivy.utils.get_color_from_hex
 #: import JsonStore kivy.storage.jsonstore
+#: import data packData
+#coding: -*- utf-8 -*-
 <WindowManager>:
     transition: WipeTransition()
     canvas.before:
@@ -17,6 +19,7 @@
     KaruHouse:
         id: kh
     SettingsScreen:
+        id: settings
 
 
 <Menu>:
@@ -119,6 +122,7 @@
         size_hint: .08, .08
         pos_hint: {'center_x': .45, 'center_y': .62}
         source: 'resources/icons/crown.png'
+
 
 <LetterButton@Button>
     background_color: 0,0,0,0  # the last zero is the critical on, make invisible
@@ -576,6 +580,7 @@
         background_color: 0, 0, 0, 0
         on_press: AmbonWidget.help()
         on_release: AmbonWidget.wordChecker()
+        disabled: True if help_amount.text=='0' else False
         size_hint: .125, .075
         pos_hint: {"center_x": .4, "center_y": .125}
         canvas.before:
@@ -585,12 +590,25 @@
                 size: help_button.size
                 pos: help_button.pos
                 source: 'resources/icons/suggestion.png'
+    Label:
+        id: help_amount
+        text: str(AmbonWidget.hints)
+        size: self.size
+        font_size: 35
+        pos_hint: {"center_x": .45, "center_y": .15}
+        canvas.before:
+            Color:
+                rgba: (.8, 0, 0, .75) if self.text!='0' else (.6, .6, .6, .75)
+            Ellipse:
+                size: 45, 45
+                pos: (self.width/2.378, self.height/7.5)
 
     Button: # Sound Button
         id: sound_button
         color: 0, 0, 0, 0
         background_color: 0, 0, 0, 0
         clicked: 0
+        disabled: True if sound_amount.text=='0' else False
         on_press: AmbonWidget.play_sound()
         size_hint: .12, .07
         pos_hint: {"center_x": .6, "center_y": .12}
@@ -601,6 +619,20 @@
                 size: self.size
                 pos: self.pos
                 source: 'resources/icons/sound.png'
+    Label:
+        id: sound_amount
+        text: str(AmbonWidget.sound_hint)
+        size: self.size
+        font_size: 35
+        pos_hint: {"center_x": .65, "center_y": .15}
+        canvas.before:
+            Color:
+                rgba: (.8, 0, 0, .75) if self.text!='0' else (.6, .6, .6, .75)
+            Ellipse:
+                size: 45, 45
+                pos: (self.width/1.618, self.height/7.5)
+
+
 #        canvas.after:
 #            Color:
 #                rgba: 1, 1, 1, 1
@@ -633,7 +665,7 @@
         cols: 6
         spacing: 15, 30
         size_hint: .5, .15
-        pos_hint:{"center_x":.5, "center_y":.32}
+        pos_hint:{"center_x":.5, "center_y":.29}
 
         LetterButton:
             id: LetterBtn1
@@ -858,6 +890,7 @@
                 pos: self.pos
 
 <SettingsScreen>:
+    id: settings
     name: "fourth"
     orientation: 'vertical'
     size: root.width, root.height
@@ -869,7 +902,372 @@
         Rectangle:
             pos: self.pos
             size: self.size
+    Label:
+        id: origin_label
+        text: data.language_names[data.origin_lang]
+        font_size: 36
+        bold: True
+        color: 1, 0, 0
+        pos_hint: {'center_x':.5, 'center_y':.875}
+    ScrollView:
+        pos_hint: {'center_x':.5, 'center_y':.8}
+        size_hint: .75, .1
+        do_scroll_x: True
+        do_scroll_y: False
+        canvas.before:
+            Color:
+                rgba: (0, 0, 0, .25)
+            # Rectangle is the background
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            id: boxlayout
+            size_hint_x: None
+            size_hint_y: .9
+            width: root.width
+            cols: 11
+            rows: 1
+            spacing: 20
+            padding: 15, 35, 15 ,35
+            ToggleButton:
+                id: origin_ambon
+                group: 'origins'
+                language: "Ambonese"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/ambon.png'
+            ToggleButton:
+                id: origin_dutch
+                group: 'origins'
+                language: "Dutch"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/nl.png'
+            ToggleButton:
+                id: origin_english
+                group: 'origins'
+                language: "English"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/gb.png'
+            ToggleButton:
+                id: origin_german
+                group: 'origins'
+                language: "German"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/de.png'
+            ToggleButton:
+                id: origin_spanish
+                group: 'origins'
+                language: "Spanish"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/es.png'
+            ToggleButton:
+                id: origin_indonesian
+                group: 'origins'
+                language: "Indonesian"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/id.png'
+            ToggleButton:
+                id: origin_russian
+                group: 'origins'
+                language: "Russian"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/ru.png'
+            ToggleButton:
+                id: origin_french
+                group: 'origins'
+                language: "French"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/fr.png'
+            ToggleButton:
+                id: origin_korean
+                group: 'origins'
+                language: "Korean"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/kr.png'
+            ToggleButton:
+                id: origin_japanese
+                group: 'origins'
+                language: "Japanese"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/jp.png'
+            ToggleButton:
+                id: origin_italian
+                group: 'origins'
+                language: "Italian"
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/it.png'
 
+    Label:
+        id: dest_label
+        text: data.language_names[data.dest_lang]
+        font_size: 36
+        bold: True
+        color: 1, 0, 0
+        pos_hint: {'center_x':.5, 'center_y':.675}
+
+    ScrollView:
+        pos_hint: {'center_x':.5, 'center_y':.6}
+        size_hint: .75, .1
+        do_scroll_x: True
+        do_scroll_y: False
+        canvas.before:
+            Color:
+                rgba: (0, 0, 0, .25)
+            # Rectangle is the background
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            id: boxlayout2
+            size_hint_x: None
+            size_hint_y: .9
+            width: root.width
+            cols: 11
+            rows: 1
+            spacing: 20
+            padding: 15, 35, 15 ,35
+            ToggleButton:
+                id: dest_ambon
+                group: 'destinations'
+                language: "Ambonese"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/ambon.png'
+            ToggleButton:
+                id: dest_dutch
+                group: 'destinations'
+                language: "Dutch"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/nl.png'
+            ToggleButton:
+                id: dest_english
+                group: 'destinations'
+                language: "English"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/gb.png'
+            ToggleButton:
+                id: dest_german
+                group: 'destinations'
+                language: "German"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .2
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/de.png'
+            ToggleButton:
+                id: dest_spanish
+                group: 'destinations'
+                language: "Spanish"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/es.png'
+            ToggleButton:
+                id: dest_indonesian
+                group: 'destinations'
+                language: "Indonesian"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/id.png'
+            ToggleButton:
+                id: dest_russian
+                group: 'destinations'
+                language: "Russian"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/ru.png'
+            ToggleButton:
+                id: dest_french
+                group: 'destinations'
+                language: "French"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/fr.png'
+            ToggleButton:
+                id: dest_korean
+                group: 'destinations'
+                language: "Korean"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/kr.png'
+            ToggleButton:
+                id: dest_japanese
+                group: 'destinations'
+                language: "Japanese"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/jp.png'
+            ToggleButton:
+                id: dest_italian
+                group: 'destinations'
+                language: "Italian"
+                on_press: dest_label.text = data.language_names[self.language]; settings.dest_lang = self.language; root.choose_dest()
+                size_hint: .1, .60
+                background_color: 0, 0, 0, 0
+                canvas.after:
+                    Color:
+                        rgba: (1, 1, 1, .25) if self.state=='down' else (1, 1, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                        source: 'resources/icons/120x90/it.png'
 
     Button:
         text: "Menu"

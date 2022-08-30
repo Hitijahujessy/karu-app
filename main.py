@@ -1,6 +1,9 @@
 # Using kivy 2.0.0 and python3.8
 
+
+import importlib
 import os
+
 import kivy
 
 from kivy.config import Config  # For setting height (19.5:9)
@@ -28,15 +31,17 @@ from kivy.storage.jsonstore import JsonStore
 
 import random
 import time
-import packData
-import karuData
 
-kivy.require('2.0.0')  # Version of Kivy
+import karuData
+import packData
+
+kivy.require('2.0.0')  # Version of Kivy)
 #os.environ["KIVY_AUDIO"] = "sdl12" #audio_ffpyplayer, audio_sdl2 (audio_gstplayer, audio_avplayer ignored)
 Config.set('graphics', 'width', '360')  # (New Android smartphones e.g. OnePlus 7 series)
 Config.set('graphics', 'height', '640')  # (iPhone X, 11 and 12 series, upsampled)
 store = JsonStore('resources/user_data.json')  # For saving high score
 root_widget = Builder.load_file('layout.kv')
+# root_widget = Builder.load_string(open("layout.kv", encoding="utf-8").read(), rulesonly=True)
 
 
 # os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'  # If necessary, uncomment to prevent OpenGL error
@@ -49,6 +54,9 @@ class KaruWidget(Widget):
 
 
 class GameWidget(Screen, FloatLayout):
+
+    importlib.reload(packData)
+
     karu = KaruWidget()
     # click_sound = SoundLoader.load('resources/Sounds/click_button.wav')
 
@@ -153,18 +161,24 @@ class GameWidget(Screen, FloatLayout):
     charloc = 0
 
     # Hints
-    hints = 5  # Total amount of hint per game
+    hints = 500  # Total amount of hint per game
     hints_used = 0  # Amount of hints used in level
+    sound_hint = 5
+    sound_used = 0
 
     def __init__(self, **kwargs):
 
         super(GameWidget, self).__init__(**kwargs)
+
+
 
         # Start randomizeLetters() to randomize and add letters to letterBtns
         # self.randomizeLetters()
 
     # Function for changing words and images when answer correct
     def words(self):
+
+
 
         # Check if level is cleared
         if self.level_finish:
@@ -174,6 +188,11 @@ class GameWidget(Screen, FloatLayout):
                 self.help_button.disabled = False
 
             self.level_finish = False  # New level started, level finish = false
+
+            if self.sound_hint == 0:
+                self.ids.sound_button.disabled = True
+            else:
+                self.ids.sound_button.disabled = False
 
             self.time = 0
             self.coins = 0
@@ -190,14 +209,16 @@ class GameWidget(Screen, FloatLayout):
             self.letters_btn = self.currentWord
 
             self.imagewidget.source = self.currentImage
-            print(self.currentWord)  # Test if currentWord is updated
-            print(self.currentImage)  # Test if currentImage is updated
-            print(self.emptyspace)  # Test if empty space is updated
+            # print(self.currentWord)  # Test if currentWord is updated
+            # print(self.currentImage)  # Test if currentImage is updated
+            # print(self.emptyspace)  # Test if empty space is updated
 
             self.randomizeLetters()  # Randomize letters for buttons
 
     # Function for randomizing letters for buttons
     def randomizeLetters(self):
+
+        self.mainlanglabel.text = self.currentWordOrigin
 
         if not self.grid_exist:
             self.grid = GridLayout(rows=1, cols=len(self.currentWord), spacing=10, size_hint_x=.55, size_hint_y=.075,
@@ -218,6 +239,8 @@ class GameWidget(Screen, FloatLayout):
             print('grid cleared')
 
         self.start_time()
+
+        self.sound_used = 0
 
         self.remove_widget(self.next_button)
         self.imagewidget.opacity = 1
@@ -257,7 +280,7 @@ class GameWidget(Screen, FloatLayout):
 
                     if add_letter not in self.letters_btn and add_letter not in self.word:
                         self.letters_btn += add_letter  # Append chosen letter to letters_btn
-                        print(self.letters_btn)
+                        # print(self.letters_btn)
                         break
 
                     else:
@@ -268,7 +291,7 @@ class GameWidget(Screen, FloatLayout):
 
         self.letters_btn = list(self.letters_btn)
         random.shuffle(self.letters_btn)  # Shuffle letters to prevent currentWord from appearing in correct order
-        print(self.letters_btn)  # Check list of letters to make sure that new list is indeed updated
+        # print(self.letters_btn)  # Check list of letters to make sure that new list is indeed updated
         self.letters_btn = str(self.letters_btn)
         self.letters_btn = self.letters_btn.replace(' ', '')
         self.letters_btn = self.letters_btn.replace(',', '')
@@ -338,7 +361,7 @@ class GameWidget(Screen, FloatLayout):
 
         old_charloc = self.charloc + 1
 
-        print(self.wordbuttons[self.charloc].text)
+        # print(self.wordbuttons[self.charloc].text)
         if self.wordbuttons[self.charpos] != '_':
 
             try:
@@ -347,12 +370,11 @@ class GameWidget(Screen, FloatLayout):
                 print(IndexError)
             self.charloc = old_charloc
 
-            print(self.charloc)
+            # print(self.charloc)
 
     def help(self):
 
         self.hints_used += 1
-        self.hints = 500
 
         if self.hints >= 1:
             self.help_button.disabled = False
@@ -376,9 +398,10 @@ class GameWidget(Screen, FloatLayout):
 
                 self.hints -= 1
                 print(self.hints)
+                self.ids.help_amount.text = str(self.hints)
 
-                if self.hints <= 0:
-                    self.help_button.disabled = True
+                # if self.hints <= 0:
+                #     self.help_button.disabled = True
 
                 # if '_' not in self.wordbuttons[(wordlength-1)].text:
                 #     self.wordChecker()
@@ -414,7 +437,18 @@ class GameWidget(Screen, FloatLayout):
 
     def play_sound(self):
 
-        file = 'resources/Sounds/langsambonese/' + self.currentWord + '.wav'
+
+        self.sound_used += 1
+        if self.sound_used == 1:
+
+            self.sound_hint -= 1
+            self.ids.sound_amount.text = str(self.sound_hint)
+
+        print(self.sound_hint)
+        print(self.ids.sound_button.text)
+
+        language = self.data.dest_lang.lower()
+        file = 'resources/Sounds/langs' + language + '/' + self.currentWord + '.mp3'
 
         click_sound = SoundLoader.load(file)
 
@@ -472,6 +506,8 @@ class GameWidget(Screen, FloatLayout):
                             "kivy.uix.widget.WidgetException: Cannot add <kivy.uix.button.Button object at 0x7fb802ff30b0>, it already has a parent <Screen name='second'")
 
                     self.next_button.opacity = 1
+                    self.ids.sound_button.disabled = True
+                    self.ids.help_button.disabled = True
                     self.victory_sound()
                     time.sleep(.8)
                     self.play_sound()
@@ -506,8 +542,9 @@ class GameWidget(Screen, FloatLayout):
                 self.emptyspace = ('_' * len(self.currentWord))
 
                 for x in range(len(self.wordbuttons)):
-                    self.wordbuttons[x].text = '_'
-                    self.wordbuttons[x].color = (1, 1, 1, 1)
+                    if self.wordbuttons[x].text != ' ':
+                        self.wordbuttons[x].text = '_'
+                        self.wordbuttons[x].color = (1, 1, 1, 1)
 
                 self.mistakes += 1
 
@@ -571,7 +608,6 @@ class GameWidget(Screen, FloatLayout):
             self.start_btn.text = 'Goed gedaan!'
 
         elif self.early_stop:
-            print('Heading back to menu')
             Clock.unschedule(self.increment_time)
             self.reload()
 
@@ -579,8 +615,6 @@ class GameWidget(Screen, FloatLayout):
             Clock.unschedule(self.increment_time)
 
     def pause_time(self):
-
-        print("try to pause")
 
         if not self.game_finish:
 
@@ -633,6 +667,8 @@ class GameWidget(Screen, FloatLayout):
 
     def reload(self):
 
+        importlib.reload(packData)
+
         self.score = 0  # Total score
         self.level_finish = False  # Bool to check if current level is cleared
 
@@ -647,24 +683,26 @@ class GameWidget(Screen, FloatLayout):
         # i = letterBtn pressed (i.e. i = 0 = letterBtn1)
         self.i = 0
 
-        # WORDS Function #
 
         # import module packData, containing image's and corresponding words, also randomize index for variation
-        originlist = self.data.pack_origin
-        wordlist = self.data.pack_dest  # Current list of words
-        indexlist = list(wordlist.keys())  # Index current word
-        print(indexlist)
-        random.shuffle(indexlist)
-        print(indexlist)
-        level = 0
-        index = indexlist[level]
+        self.data = packData
+        self.originlist = self.data.pack_origin
+        self.wordlist = self.data.pack_dest  # Current list of words
+        self.indexlist = list(self.wordlist.keys())  # Index current word
+        print(self.indexlist)
+        random.shuffle(self.indexlist)
+        print(self.indexlist)
+        self.level = 0
+        self.index = self.indexlist[self.level]
 
         # Word for current level
-        currentWord = wordlist[index]
-        currentWordOrigin = originlist[index]
+        self.currentWord = self.wordlist[self.index]
+        self.currentWordOrigin = self.originlist[self.index]
+
+        self.mainlanglabel.text = ''
 
         # Image for current level
-        currentImage = self.data.pack_img[index]
+        self.currentImage = self.data.pack_img[self.index]
 
         # Used to assign letters to buttons
         self.letters_btn = self.currentWord
@@ -676,8 +714,32 @@ class GameWidget(Screen, FloatLayout):
         self.charloc = 0
 
         # Hints
-        self.hints = 5  # Total amount of hints per game
+        self.hints = 500  # Total amount of hint per game
         self.hints_used = 0  # Amount of hints used in level
+        self.sound_hint = 5
+        self.sound_used = 0
+
+        try:
+            self.ids.help_button.disabled = False
+
+        except Exception as e:
+            print(e)
+
+        try:
+            self.ids.sound_button.disabled = False
+        except Exception as e:
+            print(e)
+        try:
+            self.ids.help_amount.text = str(self.hints)
+
+        except Exception as e:
+            print(e)
+
+        try:
+            self.ids.sound_amount.text = str(self.sound_hint)
+
+        except Exception as e:
+            print(e)
 
         # Vars and widgets related to wordbuttons
         self.answer_to_check = []
@@ -753,6 +815,7 @@ class Menu(Screen, BoxLayout):
 
 
 class PopupBg(Popup):
+    # import packData
 
     backgroundnumber = 1
     backgroundnumber_buy = 1
@@ -869,7 +932,10 @@ class PopupBg(Popup):
             print('current wallet: ', self.wallet)
             store.put("wallet", coins=self.wallet)
 
-            store['backgrounds'][self.bg_index] = True
+            store['backgrounds']['unlocked'][self.bg_index] = True
+            self.bg_buttons[self.backgroundnumber_buy].remove_widget(self.bg_buttons[self.backgroundnumber_buy].ids.lock_img)  # Remove lock button and img
+            self.bg_buttons[self.backgroundnumber_buy].remove_widget(self.bg_buttons[self.backgroundnumber_buy].ids.lock_button)
+            #self.bg_buttons[self.backgroundnumber_buy]
 
             self.title = ('KaruCoins: ' + str(round(self.wallet)))
 
@@ -891,7 +957,6 @@ class PopupBg(Popup):
 
         store.put("custom", current_bg=packData.backgrounds[self.current_bg])
 
-        print("click")
 
 
             # if self.bg_unlocked[self.bg_index]:
@@ -935,7 +1000,24 @@ class PopupOutfit(Popup):
 
 
 class SettingsScreen(Screen, BoxLayout):
-    pass
+
+    origin_lang = ""
+    dest_lang = ""
+
+    def choose_lang(self):
+        store.put("origin_lang", language=self.origin_lang)
+        print(store.get("origin_lang"))
+
+        importlib.reload(packData)
+
+    def choose_dest(self):
+        store.put("dest_lang", language=self.dest_lang)
+        print(store.get("dest_lang"))
+
+        importlib.reload(packData)
+
+
+
 
 
 class WindowManager(ScreenManager):
@@ -951,3 +1033,4 @@ class KaruApp(App):
 
 
 KaruApp().run()
+
