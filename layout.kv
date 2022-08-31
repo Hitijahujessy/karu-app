@@ -494,7 +494,6 @@
     letterBtn16: LetterBtn16
     letterBtn17: LetterBtn17
     letterBtn18: LetterBtn18
-    letterBtn19: LetterBtn19
 
     next_button: next_button
 
@@ -631,6 +630,24 @@
             Ellipse:
                 size: 45, 45
                 pos: (self.width/1.618, self.height/7.5)
+
+    Button:
+        id: pass_button
+        text: 'Pass'
+        bold: True
+        color: 1, 1, 1, 1
+        background_color: 0, 0, 0, 0
+        on_press: AmbonWidget.skip_level(); AmbonWidget.wordChecker()
+        size_hint: .12, .07
+        pos_hint: {"center_x": .1, "center_y": .05}
+        canvas.before:
+            Color:
+                rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (AmbonWidget.secondary_color2)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+
+
 
 
 #        canvas.after:
@@ -775,12 +792,7 @@
             bold: True
             on_press: AmbonWidget.click_button(); AmbonWidget.i = 17; AmbonWidget.typeWord()
             on_release: AmbonWidget.wordChecker()
-        LetterButton:
-            id: LetterBtn19
-            text:
-            bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 18; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+
     Button:
         id: next_button
         text: '>'

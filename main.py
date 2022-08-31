@@ -166,6 +166,8 @@ class GameWidget(Screen, FloatLayout):
     sound_hint = 5
     sound_used = 0
 
+    skip = False
+
     def __init__(self, **kwargs):
 
         super(GameWidget, self).__init__(**kwargs)
@@ -197,6 +199,7 @@ class GameWidget(Screen, FloatLayout):
             self.time = 0
             self.coins = 0
             self.mistakes = 0
+            self.skip = False
 
             self.currentWord = self.wordlist[self.index]  # New word
             self.currentImage = self.data.pack_img[self.index]  # Corresponding image
@@ -264,7 +267,7 @@ class GameWidget(Screen, FloatLayout):
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
                      self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
-                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18]
 
         # turn button opacity to 1
         for x in range(18):
@@ -325,7 +328,7 @@ class GameWidget(Screen, FloatLayout):
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
                      self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
-                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18]
 
         # Get amount of characters in 'answer' label for iteration
         wordlength = len(self.emptyspace)
@@ -386,7 +389,7 @@ class GameWidget(Screen, FloatLayout):
         letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
                      self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
                      self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
-                     self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18]
 
         for x in range(wordlength):
 
@@ -416,15 +419,57 @@ class GameWidget(Screen, FloatLayout):
 
         print('help')
 
+    def skip_level(self):
+
+        print('Skippitydoo')
+        self.skip = True
+
+        labeltext = list(self.emptyspace)
+        wordlength = len(self.emptyspace)
+
+        # Turn all letterBtn variables into a list for efficiency
+        letterBtn = [self.letterBtn1, self.letterBtn2, self.letterBtn3, self.letterBtn4, self.letterBtn5,
+                     self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
+                     self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14, self.letterBtn15,
+                     self.letterBtn16, self.letterBtn17, self.letterBtn18]
+
+        for x in range(wordlength):
+
+            # Check if current character is '-', if yes, replace with letter on pressed button
+            if self.wordbuttons[x].text == '_':
+                self.wordbuttons[x].text = self.currentWord[x].upper()
+                self.wordbuttons[x].disabled = True
+                self.wordbuttons[x].color = (0, .4, 1, 1)
+
+                if '_' in self.emptyspace:
+
+                    continue
+
+                else:
+
+                    break
+
+
+
+            else:
+
+                continue
+
+
 
     def victory_sound(self):
 
-        press_sound = None
-        file = 'resources/Sounds/correct.wav'
-        press_sound = SoundLoader.load(file)
+        if not self.skip:
 
-        press_sound.volume = .8
-        press_sound.play()
+            press_sound = None
+            file = 'resources/Sounds/correct.wav'
+            press_sound = SoundLoader.load(file)
+
+            press_sound.volume = .8
+            press_sound.play()
+        else:
+            print('No sound for a skipper')
+            pass
 
     def incorrect_sound(self):
 
@@ -519,7 +564,7 @@ class GameWidget(Screen, FloatLayout):
                                  self.letterBtn6, self.letterBtn7, self.letterBtn8, self.letterBtn9, self.letterBtn10,
                                  self.letterBtn11, self.letterBtn12, self.letterBtn13, self.letterBtn14,
                                  self.letterBtn15,
-                                 self.letterBtn16, self.letterBtn17, self.letterBtn18, self.letterBtn19]
+                                 self.letterBtn16, self.letterBtn17, self.letterBtn18]
 
                     for x in range(len(letterBtn)):
                         try:
@@ -559,25 +604,21 @@ class GameWidget(Screen, FloatLayout):
 
         # If it took 30 seconds or longer to complete level, 5 points are rewarded (instead of 0 points, since the
         # answer was eventually correct)
-        if self.time >= 30:
+        if self.skip:
 
-            self.score += 5
+            self.score += 0
 
-        elif self.time <= 5 and self.hints_used == 0 and self.mistakes == 0:
+        elif self.hints_used >= 1 or self.mistakes >= 1:
+
+            self.score += (30 - (self.hints_used + self.mistakes))
+
+        elif self.hints_used == 0 and self.mistakes == 0:
 
             self.score += self.points
             self.flawless = True
 
-        else:
 
-            if (self.points - ((self.hints_used * 2) + (self.time * 2))) < 5:
-                self.score += 5
 
-            else:
-
-                self.score += (self.points - ((self.hints_used * 2) + (
-                        self.time * 2)))  # Formula to calculate awarded points:
-                # total score + (50 points - ((hints*2) + (seconds * 2)))
 
         print("Score: %s \nTime: %d\n" % (round(self.score), round(self.time)))
 
@@ -634,19 +675,17 @@ class GameWidget(Screen, FloatLayout):
 
     def pay_coins(self):
 
-        if self.flawless:
+        if self.skip:
+            self.coins += 0
+
+        elif self.flawless:
             self.coins += self.payout
             self.flawless = False
             print('flawless victory')
+
         elif not self.flawless:
 
-            if (self.payout - ((self.mistakes + self.hints_used) + (self.time / 2))) <= 0:
-                self.coins += 1
-                print('0 of minder')
-            else:
-                self.coins += round((self.payout - ((self.mistakes + self.hints_used) + (self.time / 2))))
-                print("%a - ((%s + %d) + (%f/2) = %g" % (
-                    self.payout, self.mistakes, self.hints_used, self.time, self.coins))
+            self.coins += 5
 
         print("Earned %s coins" % self.coins)
         self.coins_total += self.coins
@@ -655,6 +694,10 @@ class GameWidget(Screen, FloatLayout):
             store.put("wallet", coins=self.wallet)
             self.wallet = store.get("wallet")["coins"]
             print("Wallet: %s" % self.wallet)
+
+
+
+
 
     def high_score(self):
         highscore = self.highscore
