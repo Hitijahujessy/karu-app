@@ -1,4 +1,5 @@
 # Using kivy 2.0.0 and python3.8
+# -*- coding: utf-8 -*-
 
 
 import importlib
@@ -248,7 +249,13 @@ class GameWidget(Screen, FloatLayout):
         self.remove_widget(self.next_button)
         self.imagewidget.opacity = 1
 
-        all_letters = list("abcdefghijklmnopqrstuvwxyz")  # Possible letters for randomizing
+        all_letters = list("abcdefghijklmnopqrstuvwxyz")  # Possible letters for randomizing (Roman)
+        if self.data.dest_lang == 'Russian':
+            all_letters = list("абвгдеёжзийклмнопрстуфхцчшщъыьэюя")  # Possible letters for randomizing (Russian)
+        elif self.data.dest_lang == 'Japanese':
+            all_letters = list("アァカサタナハマヤャラワガザダバパピビヂジギヰリミヒニチシキィイウゥクスツヌフムユュルグズヅブプペベデゼゲヱレメヘネテセケェエオォコソトノホモヨョロヲゴゾドボポヴッン")  # Possible letters for randomizing (Japanese)
+        elif self.data.dest_lang == 'Korean':
+            all_letters = list("ᄀᄁᄂᄃᄄᄅᄆᄇᄈᄉᄊᄋᄌᄍᄎᄏᄐᄑ햬양약얀야앵액애앞앙압암알안악아어억언얼엄업엉에여역연열염엽영예용욕요왼왜왕왈완와옹옴올온옥오우욱운울움웅워원월위유육윤율융윷으은을음읍응의이익인일임입잉잎")  # Possible letters for randomizing (Korean)
         self.word = self.currentWord
 
         if ' ' in self.word:
@@ -421,7 +428,6 @@ class GameWidget(Screen, FloatLayout):
 
     def skip_level(self):
 
-        print('Skippitydoo')
         self.skip = True
 
         labeltext = list(self.emptyspace)
