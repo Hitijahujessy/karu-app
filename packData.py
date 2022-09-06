@@ -32,6 +32,7 @@ origin = df[origin_lang].tolist()
 dest = df[store.get("dest_lang")["language"]].tolist()
 imgs = df['IMG'].tolist()
 print("module", origin)
+print("module", dest)
 
 pack_len = len(origin)
 pack_origin = {}

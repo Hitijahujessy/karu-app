@@ -4,6 +4,12 @@
 #: import JsonStore kivy.storage.jsonstore
 #: import data packData
 #coding: -*- utf-8 -*-
+<Label>:
+    font_name: 'SourceHanSansHW-Bold.otf'
+<Button>:
+    font_name: 'SourceHanSansHW-Bold.otf'
+
+
 <WindowManager>:
     transition: WipeTransition()
     canvas.before:
@@ -608,7 +614,7 @@
         background_color: 0, 0, 0, 0
         clicked: 0
         disabled: True if sound_amount.text=='0' else False
-        on_press: AmbonWidget.play_sound()
+        on_press: AmbonWidget.sound_used += 1; AmbonWidget.play_sound()
         size_hint: .12, .07
         pos_hint: {"center_x": .6, "center_y": .12}
         canvas.before:
@@ -946,7 +952,7 @@
                 id: origin_ambon
                 group: 'origins'
                 language: "Ambonese"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .2
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -960,7 +966,7 @@
                 id: origin_dutch
                 group: 'origins'
                 language: "Dutch"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .2
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -974,7 +980,7 @@
                 id: origin_english
                 group: 'origins'
                 language: "English"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .2
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -988,7 +994,7 @@
                 id: origin_german
                 group: 'origins'
                 language: "German"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .2
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1002,7 +1008,7 @@
                 id: origin_spanish
                 group: 'origins'
                 language: "Spanish"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1016,7 +1022,7 @@
                 id: origin_indonesian
                 group: 'origins'
                 language: "Indonesian"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1030,7 +1036,7 @@
                 id: origin_russian
                 group: 'origins'
                 language: "Russian"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1044,7 +1050,7 @@
                 id: origin_french
                 group: 'origins'
                 language: "French"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1058,7 +1064,7 @@
                 id: origin_korean
                 group: 'origins'
                 language: "Korean"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1072,7 +1078,7 @@
                 id: origin_japanese
                 group: 'origins'
                 language: "Japanese"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1086,7 +1092,7 @@
                 id: origin_italian
                 group: 'origins'
                 language: "Italian"
-                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_lang()
+                on_press: origin_label.text = data.language_names[self.language]; settings.origin_lang = self.language; root.choose_origin()
                 size_hint: .1, .60
                 background_color: 0, 0, 0, 0
                 canvas.after:
@@ -1097,10 +1103,12 @@
                         pos: self.pos
                         source: 'resources/icons/120x90/it.png'
 
+
     Label:
         id: dest_label
         text: data.language_names[data.dest_lang]
         font_size: 36
+        font_name: 'SourceHanSansHW-Bold.otf'
         bold: True
         color: 1, 0, 0
         pos_hint: {'center_x':.5, 'center_y':.675}

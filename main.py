@@ -131,9 +131,7 @@ class GameWidget(Screen, FloatLayout):
     originlist = data.pack_origin
     wordlist = data.pack_dest  # Current list of words
     indexlist = list(wordlist.keys())  # Index current word
-    print(indexlist)
     random.shuffle(indexlist)
-    print(indexlist)
     level = 0
     index = indexlist[level]
 
@@ -141,6 +139,7 @@ class GameWidget(Screen, FloatLayout):
     currentWord = wordlist[index]
     currentWordOrigin = originlist[index]
     word = ''
+    print(currentWord, currentWordOrigin)
 
     # Image for current level
     currentImage = data.pack_img[index]
@@ -149,6 +148,7 @@ class GameWidget(Screen, FloatLayout):
 
     # Used to assign letters to buttons
     letters_btn = currentWord
+    print(letters_btn)
 
     # Used as text for label
     emptyspace = ('_' * len(currentWord))
@@ -184,45 +184,48 @@ class GameWidget(Screen, FloatLayout):
 
 
         # Check if level is cleared
-        if self.level_finish:
+        #if self.level_finish:
 
-            if self.hints >=1:
+        if self.hints >=1:
 
-                self.help_button.disabled = False
+            self.help_button.disabled = False
 
-            self.level_finish = False  # New level started, level finish = false
+        self.level_finish = False  # New level started, level finish = false
 
-            if self.sound_hint == 0:
-                self.ids.sound_button.disabled = True
-            else:
-                self.ids.sound_button.disabled = False
+        if self.sound_hint == 0:
+            self.ids.sound_button.disabled = True
+        else:
+            self.ids.sound_button.disabled = False
 
-            self.time = 0
-            self.coins = 0
-            self.mistakes = 0
-            self.skip = False
+        self.time = 0
+        self.coins = 0
+        self.mistakes = 0
+        self.skip = False
 
-            self.currentWord = self.wordlist[self.index]  # New word
-            self.currentImage = self.data.pack_img[self.index]  # Corresponding image
-            self.currentWordOrigin = self.originlist[self.index]
-            self.mainlanglabel.text = self.currentWordOrigin
-            self.emptyspace = ('_' * len(self.currentWord))  # Set empty space ('-') to len(currentWord)
+        self.currentWord = self.wordlist[self.index]  # New word
+        self.currentImage = self.data.pack_img[self.index]  # Corresponding image
+        self.currentWordOrigin = self.originlist[self.index]
+        self.mainlanglabel.text = self.currentWordOrigin
+        self.emptyspace = ('_' * len(self.currentWord))  # Set empty space ('-') to len(currentWord)
 
-            # Clear answer label
+        print("function words()", self.currentWord, self.currentWordOrigin, self.emptyspace)
+        # Clear answer label
 
-            self.letters_btn = self.currentWord
+        self.letters_btn = self.currentWord
+        print(self.letters_btn)
 
-            self.imagewidget.source = self.currentImage
-            # print(self.currentWord)  # Test if currentWord is updated
-            # print(self.currentImage)  # Test if currentImage is updated
-            # print(self.emptyspace)  # Test if empty space is updated
+        self.imagewidget.source = self.currentImage
+        # print(self.currentWord)  # Test if currentWord is updated
+        # print(self.currentImage)  # Test if currentImage is updated
+        # print(self.emptyspace)  # Test if empty space is updated
 
-            self.randomizeLetters()  # Randomize letters for buttons
+        self.randomizeLetters()  # Randomize letters for buttons
 
     # Function for randomizing letters for buttons
     def randomizeLetters(self):
 
         self.mainlanglabel.text = self.currentWordOrigin
+        print("fucntion randomizeLetters()", self.currentWordOrigin, self.mainlanglabel.text)
 
         if not self.grid_exist:
             self.grid = GridLayout(rows=1, cols=len(self.currentWord), spacing=10, size_hint_x=.55, size_hint_y=.075,
@@ -489,11 +492,12 @@ class GameWidget(Screen, FloatLayout):
     def play_sound(self):
 
 
-        self.sound_used += 1
         if self.sound_used == 1:
 
             self.sound_hint -= 1
             self.ids.sound_amount.text = str(self.sound_hint)
+
+        self.sound_used = 0
 
         print(self.sound_hint)
         print(self.ids.sound_button.text)
@@ -756,6 +760,9 @@ class GameWidget(Screen, FloatLayout):
         # Used to assign letters to buttons
         self.letters_btn = self.currentWord
 
+        print(self.currentWord, self.currentWordOrigin)
+        print(self.letters_btn)
+
         # Used as text for label
         self.emptyspace = ('_' * len(self.currentWord))
 
@@ -841,7 +848,8 @@ class GameWidget(Screen, FloatLayout):
             with self.canvas.before:
                 Rectangle(source=store.get('custom')['current_bg'], size=self.size, pos=self.pos)
 
-            self.randomizeLetters()
+            self.reload()
+            self.words()
             self.go_to_menu = False
 
             self.remove_widget(self.start_btn)
@@ -1050,20 +1058,24 @@ class PopupOutfit(Popup):
 
 class SettingsScreen(Screen, BoxLayout):
 
+    # Empty variables that will be filled using the flag buttons (see layout.kv line 951-1290)
     origin_lang = ""
     dest_lang = ""
 
-    def choose_lang(self):
+    # Choose the origin language (would usually be user's native language)
+    def choose_origin(self):
+        # Changes "origin_lang" in user_data.json to chosen language. packData.py uses this json file for making and
+        # importing wordlists
         store.put("origin_lang", language=self.origin_lang)
-        print(store.get("origin_lang"))
 
-        importlib.reload(packData)
-
+    # Choose the destination language (this is the language user wants to learn)
     def choose_dest(self):
-        store.put("dest_lang", language=self.dest_lang)
-        print(store.get("dest_lang"))
 
-        importlib.reload(packData)
+        # Changes "dest_lang" in user_data.json to chosen language. packData.py uses this json file for making and
+        # importing wordlists
+        store.put("dest_lang", language=self.dest_lang)
+
+
 
 
 
