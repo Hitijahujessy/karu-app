@@ -159,12 +159,74 @@
 
 #:import Factory kivy.factory.Factory
 
+<PopupFinish@Popup>
+    id: popupfinish
+    auto_dismiss: False
+    separator_color: 0, 0, 0, 0
+    background_color: 0, 0, 0, 0
+    size_hint_y: .8
+    size_hint_x: .9
+    title: ""
+    secondary_color: ((255/255), (167/255), 0, 1)
+    secondary_color2: 0,.7,.7,1
+    gw: app.root.ids.gw
+
+    FloatLayout:
+        Image:
+            source: "resources/icons/banner.png"
+            #size_hint:
+            pos_hint: {'center_x':.5, 'y':.5}
+
+        Label:
+            text: str(root.gw.score)
+            font_size: 48
+            pos_hint: {'center_x':.5, 'y':.52}
+        Button:
+            text: ''
+            on_press: root.gw.reload()
+            on_release:  root.dismiss()
+            font_size: 32
+            size_hint: .2, .12
+            pos_hint: {'center_x':.5, 'y':.45}
+            background_color: 0, 0, 0, 0
+            canvas.after:
+                Color:
+                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                Color:
+                    rgba: 1,1,1,1
+                RoundedRectangle:
+                    size: self.width/1.2, self.height/1.2
+                    pos: self.width/.387, self.height*5.22
+                    source: 'resources/icons/reload.png'
+
+        Button:
+            on_release: root.gw.reload(); root.dismiss(); app.root.current = 'first'
+            font_size: 32
+            size_hint: .2, .12
+            pos_hint: {'center_x':.5, 'y':.25}
+            background_color: 0, 0, 0, 0
+            canvas.after:
+                Color:
+                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                Color:
+                    rgba: 1,1,1,1
+                RoundedRectangle:
+                    size: self.width/1.2, self.height/1.2
+                    pos: self.width/.387, self.height/.28
+                    source: 'resources/icons/home.png'
+
 <PopupMenu@Popup>
     auto_dismiss: False
     size_hint_y: .8
     size_hint_x: .9
     title: "Pauze"
-    secondary_color: .4,.4,.4,1
+    secondary_color: ((249/255), (193/255), (109/255), .8)
     secondary_color2: 0,.7,.7,1
     gw: app.root.ids.gw
 
@@ -440,6 +502,70 @@
 #                        pos: self.pos
 #                        size: self.size
 
+<PopupPacks>:
+    id: popuppacks
+    size_hint_y: .5
+    size_hint_x: .8
+    kh: app.root.ids.kh
+    #current_pack:
+    title: ''#('KaruCoins: ' + str(round(self.wallet)))
+    #pack_name: ''
+
+
+    FloatLayout:
+        size_hint: .25, .6
+        pos_hint: {"x": 1, "y": .35}
+
+#        canvas.before:
+#            Color:
+#                rgb: 1, 0, 0
+#            Rectangle:
+#                size: self.size
+#                pos: self.pos
+        Button:
+            id: house_icon
+            on_press: house_pack.state = "down"; root.current_pack="resources/packs/huis/wordlist_house.csv" ; root.pack_switch()
+            size_hint: .35, .5
+            pos_hint: {"center_x": .25, "y": .5}
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "resources/icons/house_pack_icon.png"
+        Button:
+            id: animal_icon
+            pos_hint: {"center_x": .75, "y": .5}
+            on_press: animal_pack.state = "down"; root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
+            size_hint: .35, .5
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "resources/icons/animal_pack_icon.png"
+        CheckBox:
+            id: house_pack
+            group: "packs"
+            on_press: root.current_pack="resources/packs/huis/wordlist_house.csv" ; root.pack_switch()
+            state: "down" if root.current_pack=="resources/packs/huis/wordlist_house.csv" else "normal"
+            size_hint: .2, .2
+            pos_hint: {"center_x": .25, "center_y": .35}
+
+        CheckBox:
+            id: animal_pack
+            group: "packs"
+            on_press: root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
+            state: "down" if root.current_pack=="resources/packs/dieren/wordlist_animals.csv" else "normal"
+            size_hint: .2, .2
+            pos_hint: {"center_x": .75, "center_y": .35}
+
+
+
 
 <PopupOutfit@Popup>:
     size_hint_y: .5
@@ -475,7 +601,6 @@
             source: self.bg
     name: "second"
 
-    #karulabel: karulabel
     highscore_label: highscore_label
     wallet_label: wallet_label
 
@@ -865,7 +990,21 @@
         size: root.width/2, root.height/12
         size_hint: None, None
         on_release: Factory.PopupBg().open()
-        pos: root.width/4, root.height/1.5
+        pos_hint: {"center_x":.5, "center_y":.75}
+        background_color: 0, 0, 0, 0
+        canvas.before:
+            Color:
+                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+
+    Button:
+        text: 'Categorieën'
+        size: root.width/2, root.height/12
+        size_hint: None, None
+        on_release: Factory.PopupPacks().open()
+        pos_hint: {"center_x":.5, "center_y":.65}
         background_color: 0, 0, 0, 0
         canvas.before:
             Color:
@@ -879,7 +1018,7 @@
         size: root.width/2, root.height/12
         size_hint: None, None
         on_release: Factory.PopupOutfit().open()
-        pos: root.width/4, root.height/2
+        pos_hint: {"center_x":.5, "center_y":.55}
         background_color: 0, 0, 0, 0
         canvas.before:
             Color:
@@ -889,16 +1028,13 @@
                 pos: self.pos
 
 
-
-
-
     Button:
         text: "Menu"
         font_size: 32
         on_release: app.root.current = 'first'
         size: root.width/2, root.height/12
         size_hint: None, None
-        pos: root.width/4, root.height/3.3
+        pos_hint: {"center_x":.5, "center_y":.4}
         background_color: 0, 0, 0, 0
         canvas.before:
             Color:

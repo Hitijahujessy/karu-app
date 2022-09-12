@@ -11,7 +11,10 @@ backgrounds = {1: 'resources/backgrounds/wallpaper.png', 2: 'resources/backgroun
                9: 'resources/backgrounds/wallpaper9.png'}
 
 # Pack: In huis
-df = pd.read_csv('resources/packs/huis/wordlist_huis.csv')
+#df = pd.read_csv('resources/packs/huis/wordlist_huis.csv')
+
+# Pack: Dieren
+df = pd.read_csv(store.get("current_pack")["source"])
 
 # for language title in settings screen
 language_names = {"Dutch": "Dutch - Nederlands",
