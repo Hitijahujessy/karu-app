@@ -4,6 +4,7 @@
 
 import importlib
 import os
+from functools import partial
 
 import kivy
 
@@ -82,7 +83,7 @@ class GameWidget(Screen, FloatLayout):
     level_finish = False  # Bool to check if current level is cleared
 
     bg = ObjectProperty()
-    bg = store.get('custom')['current_bg']
+    bg = store.get('background')['current_bg']
 
     # All buttons, most efficient way I could find for now
     letterBtn1 = ObjectProperty(None)
@@ -840,14 +841,14 @@ class GameWidget(Screen, FloatLayout):
             print(AttributeError)
 
         with self.canvas.before:
-            Rectangle(source=store.get('custom')['current_bg'], size=self.size, pos=self.pos)
+            Rectangle(source=store.get('background')['current_bg'], size=self.size, pos=self.pos)
 
     def start_or_menu(self):
 
         if not self.game_finish:
 
             with self.canvas.before:
-                Rectangle(source=store.get('custom')['current_bg'], size=self.size, pos=self.pos)
+                Rectangle(source=store.get('background')['current_bg'], size=self.size, pos=self.pos)
 
             self.reload()
             self.words()
@@ -884,8 +885,127 @@ class PopupPacks(Popup):
 
 # Popup for unlocking and changing backgrounds
 class PopupBg(Popup):
+    data = packData
+    wallet = store.get("wallet")["coins"]
+    backgroundnumber = 1
+    buy_backgroundnumber = 1
+    current_bg = 1
 
-    pass
+    bg_buttons = []
+    bg_buy_buttons = []
+
+    bg = store.get('background')['current_bg']
+
+    unlocked_bg = store.get('unlocked_backgrounds')
+
+    bg_index = 'bg' + str(backgroundnumber)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        bg_scrollview = ScrollView(do_scroll_y=True, do_scroll_x=False)
+
+        data = packData
+
+        selected = 0  # View currently selected background
+        selection_rects = []
+
+        self.bg_buttons = []
+        self.bg_buy_buttons = []
+
+        bg_grid = GridLayout(rows=(len(data.backgrounds)), cols=3, size_hint_x=1, size_hint_y=None,
+                             pos_hint={'center_x': .5, 'center_y': .5}, spacing=(25, 25), padding=(50, 50, 50, 50))
+        bg_grid.bind(minimum_height=bg_grid.setter('height'))
+        bg_scrollview.add_widget(bg_grid)
+        obj = InstructionGroup()
+
+        backgroundnumber_buy = 1
+        bg_index = 'bg' + str(self.backgroundnumber)
+        bg_buy_index = 'bg' + str(backgroundnumber_buy)
+
+        backgrounddict = {}  # used for bg_unlocked in json file
+
+        for x in range(int(len(data.backgrounds) / 3)):
+
+            for i in range(3):
+                bg_button = Factory.BackgroundButton()
+
+                bg_grid.add_widget(bg_button)
+                bg_button.backgroundnumber = self.backgroundnumber
+                bg_button.bind(on_press=lambda y: self.change_bg_value())
+                # bg_button.bind(on_release=lambda x: self.background_change)
+
+                self.bg_buttons.append(bg_button)
+
+                backgrounddict[bg_index] = False
+
+                self.backgroundnumber += 1
+                bg_index = 'bg' + str(self.backgroundnumber)
+
+            for j in range(3):
+                btn_index = self.buy_backgroundnumber - 1
+                bg_buy_button = Factory.BuyButton()
+                self.bg_buy_buttons.append(bg_buy_button)
+
+                bg_grid.add_widget(self.bg_buy_buttons[btn_index])
+                self.bg_buy_buttons[btn_index].backgroundnumber_buy = self.buy_backgroundnumber
+                #new_val = self.bg_buy_buttons[btn_index].backgroundnumber_buy
+                number = self.buy_backgroundnumber
+                print(number)
+
+                self.bg_buy_buttons[btn_index].bind(on_press=partial(self.verandervalue, number))#, on_release=lambda y: self.checkout())
+
+                #self.verandervalue(new_val)
+
+
+                self.buy_backgroundnumber += 1
+
+        self.add_widget(bg_scrollview)
+        print(self.unlocked_bg)
+
+        # Loop to check which backgrounds are unlocked, so the buttons can be enabled and disabled where needed
+        self.backgroundnumber = 1
+        for x in range(len(self.bg_buttons)):
+            try:
+                bg_index = 'bg' + str(self.backgroundnumber)
+                if self.unlocked_bg[bg_index]:
+                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_img)  # Remove lock button and img
+                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_button)
+                    self.bg_buy_buttons[
+                        x].disabled = True  # BuyButton also has to be disabled and the coin_icon should be
+                    self.bg_buy_buttons[x].text = ''  # replaced with a check icon
+
+                if self.backgroundnumber != 9:
+                    self.backgroundnumber += 1
+
+            except Exception as e:
+                print(repr(e))
+
+    def verandervalue(self, val, *largs):
+        print(f'value is %d' % val)
+        print(f'bg no is %d' % self.backgroundnumber)
+        self.backgroundnumber = val
+        self.buy_backgroundnumber = val
+
+
+    def checkout(self):
+        print('checking out')
+        price = 250
+        btn_in_list = self.buy_backgroundnumber - 1
+
+        if price <= self.wallet:
+            index = 'bg' + str(self.buy_backgroundnumber)
+            print(index, str(self.buy_backgroundnumber))
+            self.bg_buttons[btn_in_list].remove_widget(
+                self.bg_buttons[btn_in_list].ids.lock_img)  # Remove lock button and img
+            self.bg_buttons[btn_in_list].remove_widget(
+                self.bg_buttons[btn_in_list].ids.lock_button)
+            self.bg_buy_buttons[
+                btn_in_list].disabled = True  # BuyButton also has to be disabled and the coin_icon should be
+            self.bg_buy_buttons[btn_in_list].text = ''  # replaced with a check icon
+
+            store["unlocked_backgrounds"][index] = True
+            store["unlocked_backgrounds"] = store["unlocked_backgrounds"]
 
     # backgroundnumber = 1
     # backgroundnumber_buy = 1
@@ -894,7 +1014,7 @@ class PopupBg(Popup):
     # bg = store.get('custom')['current_bg']
     #
     # bg_unlocked = store.get('backgrounds')
-    # 
+    #
     # bg_index = 'bg' + str(backgroundnumber)
     #
     # def __init__(self, **kwargs):
@@ -1021,7 +1141,6 @@ class PopupBg(Popup):
     #     # # self.current_bg = self.backgroundnumber
     #     #
     #     # store.put("custom", current_bg=packData.backgrounds[self.current_bg])
-
 
 
 class KaruHouse(Screen, BoxLayout):
