@@ -2,6 +2,7 @@
 #: import WipeTransition kivy.uix.screenmanager.WipeTransition
 #:import hex kivy.utils.get_color_from_hex
 #: import JsonStore kivy.storage.jsonstore
+#: import Clock kivy.clock.Clock
 #: import data packData
 #coding: -*- utf-8 -*-
 <Label>:
@@ -35,6 +36,7 @@
     size: root.width, root.height
     secondary_color: .4,.4,.4,1
     secondary_color2: 0,.7,.7,1
+    #gw: app.root.ids.gw
     #highscore_menu: root.label_highscore
     #wallet_menu: root.label_wallet
     canvas.before:
@@ -49,60 +51,85 @@
 	    id: start_button
         text: "Start"
         font_size: 32
-        on_release: app.root.current = "second"
-        size: root.width/2, root.height/12
-        size_hint: None, None
-        pos: root.width/4, root.height/2.5
+        on_press: app.root.ids.gw.second_color(); app.root.ids.gw.reload();
+        on_release: app.root.current = "second"; Clock.schedule_interval(app.root.ids.gw.countdown, .5)
+        size_hint: .2, .12
+        pos_hint: {"center_x": .4925, "center_y": .435}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas.after:
             Color:
-                rgba: menu.secondary_color if start_button.state=='normal' else menu.secondary_color2
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
             RoundedRectangle:
                 size: start_button.width, start_button.height
                 pos: start_button.pos
+            Color:
+                rgba: 1,1,1,1
+            RoundedRectangle:
+                size: self.width/1.5, self.height/1.5
+                pos: self.center_x*.875, self.center_y*.9
+                source: 'resources/icons/play.png'
 
     Button:
 	    id: ruma_button
         text: "Karu's huis"
         font_size: 32
         on_release: app.root.current = 'third'
-        size: root.width/2, root.height/12
-        size_hint: None, None
-        pos: root.width/4, root.height/3.3
+        size_hint: .2, .12
+        pos_hint: {"center_x": .4925, "center_y": .3}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas.after:
             Color:
-                rgba: menu.secondary_color if ruma_button.state=='normal' else menu.secondary_color2
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
             RoundedRectangle:
                 size: ruma_button.width, ruma_button.height
                 pos: ruma_button.pos
+            Color:
+                rgba: 1,1,1,1
+            RoundedRectangle:
+                size: self.width/1.5, self.height/1.5
+                pos: self.center_x*.865, self.center_y*.85
+                source: 'resources/icons/shop.png'
     Button:
 	    id: settings_button
         text: "Instellingen"
         font_size: 32
         on_release: app.root.current = 'fourth'
-        size: root.width/2, root.height/12
-        size_hint: None, None
-        pos: root.width/4, root.height/4.8
+        size_hint: .2, .12
+        pos_hint: {"center_x": .4925, "center_y": .165}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas.after:
             Color:
-                rgba: menu.secondary_color if settings_button.state=='normal' else menu.secondary_color2
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
             RoundedRectangle:
                 size: settings_button.width, settings_button.height
                 pos: settings_button.pos
-
+            Color:
+                rgba: 1,1,1,1
+            RoundedRectangle:
+                size: self.width/1.5, self.height/1.5
+                pos: self.center_x*.865, self.center_y*.75
+                source: 'resources/icons/settings.png'
     Image:
-        source: 'resources/karu/karulogo.png'
+        source: 'resources/karu/logo_head.png'
         size_hint: .75, .75
         pos_hint: {'center_x': .5, 'center_y': .8}
-
+        canvas.before:
+            Color:
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
+            RoundedRectangle:
+                size: self.width, self.height*.6
+                pos: self.x, self.y*1.35
+                source: 'resources/karu/logo_rect.png'
+    Image:
+        source: 'resources/karu/logo_txt.png'
+        size_hint: .75, .75
+        pos_hint: {'center_x': .5, 'center_y': .8}
     Label:
         size_hint: .5, .1
         pos_hint: {'center_x': .5, 'center_y': .6}
         canvas.before:
             Color:
-                rgba: ((249/255), (193/255), (109/255), .8)
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
@@ -110,6 +137,7 @@
     Label:
         id: highscore_menu
         text: str(round(root.highscore))
+        font_size: 36
         bold: True
         pos_hint: {'center_x': .55, 'center_y': .62}
 
@@ -120,12 +148,12 @@
         pos_hint: {'center_x': .55, 'center_y': .58}
 
     Image:
-        size_hint: .08, .08
+        size_hint: .07, .07
         pos_hint: {'center_x': .45, 'center_y': .58}
         source: 'resources/icons/karucoins.png'
 
     Image:
-        size_hint: .08, .08
+        size_hint: .07, .07
         pos_hint: {'center_x': .45, 'center_y': .62}
         source: 'resources/icons/crown.png'
 
@@ -135,32 +163,32 @@
     secondary_color2: 0,.7,.7,.8
     on_press: self.state=='down'
     opacity: 0
-    canvas.before:
-        Color:
-            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
+#    canvas.before:
+#        Color:
+#            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
+#        RoundedRectangle:
+#            pos: self.pos
+#            size: self.size
 
 <WordButton@Button>:
     text: '_'
     bold: True
+    font_size: 42
     background_color: 0, 0, 0, 0
+    disabled_color: 0, 0, 0, 0
     charpos: app.root.ids.gw.charpos
     on_press: self.text = '_'; app.root.ids.gw.charpos==self.charpos; app.root.ids.gw.backspace()
     on_release: self.state='down'
     size_hint: .2, .2
-    canvas.before:
-        Color:
-            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
+#    canvas.before:
+#        Color:
+#            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
+#        RoundedRectangle:
+#            pos: self.pos
+#            size: self.size
 
 #:import Factory kivy.factory.Factory
-
 <PopupFinish@Popup>
-    id: popupfinish
     auto_dismiss: False
     separator_color: 0, 0, 0, 0
     background_color: 0, 0, 0, 0
@@ -171,46 +199,131 @@
     secondary_color2: 0,.7,.7,1
     gw: app.root.ids.gw
 
+
+    on_open: app.root.ids.gw.count_coins_anim(self.ids.karucoin); app.root.ids.gw.new_best_sound() if app.root.ids.gw.broke_record==True else print('')
+
     FloatLayout:
-        Image:
-            source: "resources/icons/banner.png"
-            #size_hint:
-            pos_hint: {'center_x':.5, 'y':.5}
+        size: app.root.size
 
         Label:
-            text: str(root.gw.score)
             font_size: 48
-            pos_hint: {'center_x':.5, 'y':.52}
-        Button:
-            text: ''
-            on_press: root.gw.reload()
-            on_release:  root.dismiss()
-            font_size: 32
-            size_hint: .2, .12
-            pos_hint: {'center_x':.5, 'y':.45}
-            background_color: 0, 0, 0, 0
+            pos_hint: {'center_x':.375, 'y':.52}
+            canvas.before:
+                Color:
+                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.width*1.25, self.height*.85
+                    source: "resources/icons/banner.png"
+
+        Label:
+            text: str(root.gw.highscore)
+            font_size: 48
+            pos_hint: {'center_x':.5, 'y':.495}
             canvas.after:
                 Color:
-                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
-                RoundedRectangle:
-                    size: self.size
-                    pos: self.pos
                 Color:
                     rgba: 1,1,1,1
                 RoundedRectangle:
-                    size: self.width/1.2, self.height/1.2
-                    pos: self.width/.387, self.height*5.22
-                    source: 'resources/icons/reload.png'
-
+                    size: self.width*.1, self.height*.0625
+                    pos: self.x*5.5, self.y*1.7979
+                    source: 'resources/icons/crown.png'
+        Label:
+            text: "New Best!" if root.gw.broke_record==True else "Score:"
+            valign: 'middle'
+            font_size: 42
+            pos_hint: {'center_x':.5, 'y':.255}
+        Image:
+            source:'resources/icons/crown.png'
+            pos_hint: {'center_x':.5, 'y':.75}
+            size_hint: .12, .125
+            opacity: 1 if root.gw.broke_record==True else 0
+        Label:
+            text: ' {}   >   {}'.format(root.gw.highscore, root.gw.old_highscore) if root.gw.broke_record==True else " {}".format(root.gw.score)
+            valign: 'middle'
+            font_size: 57
+            pos_hint: {'center_x':.475, 'y':.18}
+        Label:
+            text: '{}'.format(root.gw.new_wallet)
+            font_size: 57
+            valign: 'middle'
+            pos_hint: {'center_x':.5, 'y':.0625}
+        Image:
+            id: karucoin
+            size_hint: .08, .08
+            pos_hint: {'center_x': .875, 'y': 1.07}
+            source: 'resources/icons/karucoin_single.png'
+            opacity: 0
         Button:
-            on_release: root.gw.reload(); root.dismiss(); app.root.current = 'first'
+            text: ''
+            on_press: root.gw.reload(); Clock.schedule_interval(app.root.ids.gw.countdown, .5)
+            on_release:  root.dismiss()
             font_size: 32
             size_hint: .2, .12
             pos_hint: {'center_x':.5, 'y':.25}
             background_color: 0, 0, 0, 0
             canvas.after:
                 Color:
-                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                Color:
+                    rgba: 1,1,1,.8
+                RoundedRectangle:
+                    size: self.width/1.2, self.height/1.2
+                    pos: self.width/.387, self.height/.285
+                    source: 'resources/icons/reload.png'
+        Button:
+            on_release: root.gw.reload(); root.dismiss(); app.root.current = 'first'
+            size_hint: .2, .12
+            pos_hint: {'center_x':.5, 'y':.05}
+            background_color: 0, 0, 0, 0
+            canvas.after:
+                Color:
+                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                Color:
+                    rgba: 1,1,1,.8
+                RoundedRectangle:
+                    size: self.width/1.2, self.height/1.2
+                    pos: self.width/.387, self.height/.545
+                    source: 'resources/icons/home.png'
+
+<PopupMenu@Popup>
+    auto_dismiss: False
+    size_hint_y: .8
+    size_hint_x: .9
+    title: ""
+    separator_color: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .75]
+    gw: app.root.ids.gw
+    main_color: self.gw.main_color
+    secondary_color2: 0,.7,.7,1
+
+    FloatLayout:
+        Label:
+            text: f"Level %d/10" % (app.root.ids.gw.level + 1)
+            bold: True
+            font_size: 36
+            size_hint: .9, .25
+            pos_hint: {'x':.05, 'y':.70}
+            canvas.before:
+                RoundedRectangle:
+                    size: root.size
+                    pos: root.pos
+
+        Button:
+            on_press: root.gw.early_stop = 1; print('early stop')
+            on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
+            font_size: 32
+            size_hint: .2, .12
+            pos_hint: {'center_x': .5, 'y':.25}
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                Color:
+                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1] if self.state=='normal' else root.secondary_color2
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
@@ -218,68 +331,27 @@
                     rgba: 1,1,1,1
                 RoundedRectangle:
                     size: self.width/1.2, self.height/1.2
-                    pos: self.width/.387, self.height/.28
+                    pos: self.width/.385, self.height/.28
                     source: 'resources/icons/home.png'
-
-<PopupMenu@Popup>
-    auto_dismiss: False
-    size_hint_y: .8
-    size_hint_x: .9
-    title: "Pauze"
-    secondary_color: ((249/255), (193/255), (109/255), .8)
-    secondary_color2: 0,.7,.7,1
-    gw: app.root.ids.gw
-
-    FloatLayout:
-        Slider:
-            min: 0
-            max: 100
-            step: 1
-            value: 50
-            size_hint: .9, .25
-            pos_hint: {'x':.05, 'y':.70}
-        Slider
-            min: 0
-            max: 100
-            step: 1
-            value: 50
-            size_hint: .9, .25
-            pos_hint: {'x':.05, 'y':.55}
-        Button:
-            text: 'Menu'
-            on_press: root.gw.early_stop = 1; print('early stop')
-            on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
-            font_size: 32
-            size: root.width/4, root.height/12
-            size_hint: None, None
-            pos_hint: {'x':.35, 'y':.25}
-            background_color: 0, 0, 0, 0
-            canvas.before:
-                Color:
-                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
-                RoundedRectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             text: ''
             on_press: root.gw.game_pause = False
             on_release:  root.dismiss(); root.gw.pause_time()
             font_size: 32
-            size: root.width/4, root.height/12
-            size_hint: None, None
-            pos_hint: {'x':.35, 'y':.40}
+            size_hint: .2, .12
+            pos_hint: {'center_x': .5, 'y':.4}
             background_color: 0, 0, 0, 0
             canvas.before:
                 Color:
-                    rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1] if self.state=='normal' else root.secondary_color2
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
                 Color:
                     rgba: 1,1,1,1
                 RoundedRectangle:
-                    size: self.width/2, self.height
-                    pos: self.width*1.9, self.height*6
+                    size: self.width/1.5, self.height/1.5
+                    pos: self.width/.375, self.height/.205
                     source: 'resources/icons/play.png'
 
 
@@ -289,7 +361,6 @@
     bold: True
     background_color: 0, 0, 0, 0
     backgroundnumber: 1
-    on_press: self.change_bg_value()
     disabled: True if self.state=='down' else False
     size_hint_x: .5
     size_hint_y: None
@@ -297,11 +368,20 @@
 
     canvas.before:
         Color:
-            rgba: (1,1,1,1) if self.state=='normal' else (0,.7,.7,1)
+            rgba: (1,1,1,1)# if self.state=='normal' else (1,1,1,.4)
         RoundedRectangle:
             size: self.width, self.height
             pos: self.pos
             source: ('resources/backgrounds/wallpaper%s.png' % self.backgroundnumber) if self.backgroundnumber > 1 else 'resources/backgrounds/wallpaper.png'
+    canvas.after:
+        Color:
+            rgba: (0, 0, 0, 0) if self.state=='normal' else (1,1,1,1)
+        Line:
+            width: 3
+            rectangle: self.x, self.y, self.width, self.height
+#        RoundedRectangle:
+#            size: self.width, self.height
+#            pos: self.pos
 
 
     Button:
@@ -329,9 +409,11 @@
     text: '   250'
     bold: True
     background_color: 0, 0, 0, 0
+    backgroundnumber_buy: 1
+    #on_press: print(self.backgroundnumber_buy)
     size_hint_y: None
     height: 80
-    backgroundnumber_buy: 1
+
 
     canvas.before:
         Color:
@@ -352,155 +434,18 @@
     id: popupbg
     size_hint_y: .65
     size_hint_x: .8
+    separator_color: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .75]
+    background_color: 0, 0, 0, 0
+    size_hint_y: .8
+    size_hint_x: .9
+    secondary_color: ((255/255), (167/255), 0, 1)
+    secondary_color2: 0,.7,.7,1
+    gw: app.root.ids.gw
+    on_dismiss: app.root.ids.mainmenu.second_color()#; app.root.ids.gw.second_color()
 
     #kh: app.root.ids.kh
-    title: ('KaruCoins: ' + str(round(self.wallet)))
-#    bg_btn1: bg_btn1
-#
-#
-#    bg_btn2: bg_btn2
-#    buy_btn2: buy_btn2
-#
-#    bg_btn3: bg_btn3
-#    buy_btn3: buy_btn3
+    #title: ('KaruCoins: ' + str(round(self.wallet)))
 
-#    on_open: Clock.schedule_once(self.update, -1); Clock.schedule_interval(self.update, .1)
-#    on_dismiss: Clock.unschedule(self.update)
-
-
-#    ScrollView:
-#        id: bg_scrollview
-#        do_scroll_x: True
-#        do_scroll_y: False
-#        pos: root.width, root.height
-#        GridLayout:
-#            cols: 3
-#            rows: 2
-#            padding: 135, 75, 135 ,75
-#            spacing: 165, 25
-#            size_hint_y: None
-#            height: self.minimum_height
-#            size_hint_x: None
-#            width: self.minimum_width
-#            Button:
-#                id: bg_btn1
-#                bg_number: 1
-#                on_press: root.current_bg = 1 #root.test() ; self.disabled = True; bg2.disabled = False
-#                on_release: root.background_change(); root.selected = 0
-#                font_size: 32
-#                size: 360/1.5, 640/1.5
-#                size_hint: None, None
-#                pos: root.width/4, root.height/6
-#                background_color: 0, 0, 0, 0
-#                canvas.before:
-#                    Color:
-#                        rgba: (1,1,1,1)# if root.bg != 'resources/backgrounds/wallpaper.png' else (0, .7, .7, .7)
-#                    RoundedRectangle:
-#                        size: self.width, self.height
-#                        pos: self.pos
-#                        source: root.data.backgrounds[1]
-#
-#            Button:
-#                id: bg_btn2
-#                disabled: True if not root.bg_unlocked['bg2'] else False
-#                color: 1, 1, 1, 1
-#                on_press: root.current_bg = 2
-#                on_release: root.background_change(); root.selected = 0
-#                font_size: 30
-#                size: 360/1.5, 640/1.5
-#                size_hint: None, None
-#                pos: root.width/4, root.height/6
-#                background_color: 0, 0, 0, 0
-#                canvas.before:
-#                    Color:
-#                        rgba: (1,1,1,1)# if bg_btn2.disabled==False else (1,1,1, .5)
-#                    RoundedRectangle:
-#                        size: self.width, self.height
-#                        pos: self.pos
-#                        source: root.data.backgrounds[2]
-#                canvas.after:
-#                    Color:
-#                        rgba: (1,1,1,0) if bg_btn2.disabled==False else (115/255,115/255,115/255, .9)
-#                    RoundedRectangle:
-#                        size: self.width, self.height
-#                        pos: self.pos
-#
-#            Button:
-#                id: bg_btn3
-#                disabled: True if not root.bg_unlocked['bg3'] else False
-#                color: 1, 1, 1, 1
-#                on_press: root.current_bg = 3# root.test()#; self.disabled = True; bg1.disabled = False
-#                on_release: root.background_change(); root.selected = 0
-#                font_size: 30
-#                size: 360/1.5, 640/1.5
-#                size_hint: None, None
-#                pos: root.width/4, root.height/6
-#                background_color: 0, 0, 0, 0
-#                canvas.before:
-#                    Color:
-#                        rgba: (1,1,1,1) #if bg_btn3.disabled==False else (1,1,1, .3)
-#                    RoundedRectangle:
-#                        size: self.width, self.height
-#                        pos: self.pos
-#                        source: root.data.backgrounds[3]
-#                canvas.after:
-#                    Color:
-#                        rgba: (1,1,1,0) if bg_btn3.disabled==False else (115/255,115/255,115/255, .9)
-#                    RoundedRectangle:
-#                        size: self.width, self.height
-#                        pos: self.pos
-#
-#            Button:
-#                id: buy_btn1
-#                disabled: True
-#                text: root.price_str if not root.bg_unlocked['bg1'] else 'Gekocht'
-#                bold: True
-#                background_color: 0, 0, 0, 0
-#                pos: self.pos
-#                size_hint: None, None
-#                size: 360/1.5, 640/8
-#                canvas.before:
-#                    Color:
-#                        rgba: 0,.7,.7,1
-#                    RoundedRectangle:
-#                        pos: self.pos
-#                        size: self.size
-#
-#            Button:
-#                id: buy_btn2
-#                disabled: False if not root.bg_unlocked['bg2'] else True
-#                text: root.price_str if not root.bg_unlocked['bg2'] else 'Gekocht'
-#                bold: True
-#                on_press: root.current_bg = 2; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
-#                on_release: root.background_change()
-#                background_color: 0, 0, 0, 0
-#                pos: self.pos
-#                size_hint: None, None
-#                size: 360/1.5, 640/8
-#                canvas.before:
-#                    Color:
-#                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
-#                    RoundedRectangle:
-#                        pos: self.pos
-#                        size: self.size
-#
-#            Button:
-#                id: buy_btn3
-#                disabled: False if not root.bg_unlocked['bg3'] else True
-#                text: root.price_str if not root.bg_unlocked['bg3'] else 'Gekocht'
-#                bold: True
-#                on_press: root.current_bg = 3; # root.test()#; self.disabled = True; bg1.disabled = False; bg3.disabled = False
-#                on_release: root.background_change()
-#                background_color: 0, 0, 0, 0
-#                pos: self.pos
-#                size_hint: None, None
-#                size: 360/1.5, 640/8
-#                canvas.before:
-#                    Color:
-#                        rgba: (0,.7,.7,1) if self.state=='normal' else (0,.7,.7,.7)
-#                    RoundedRectangle:
-#                        pos: self.pos
-#                        size: self.size
 
 <PopupPacks>:
     id: popuppacks
@@ -516,12 +461,6 @@
         size_hint: .25, .6
         pos_hint: {"x": 1, "y": .35}
 
-#        canvas.before:
-#            Color:
-#                rgb: 1, 0, 0
-#            Rectangle:
-#                size: self.size
-#                pos: self.pos
         Button:
             id: house_icon
             on_press: house_pack.state = "down"; root.current_pack="resources/packs/huis/wordlist_house.csv" ; root.pack_switch()
@@ -537,13 +476,14 @@
                     source: "resources/icons/house_pack_icon.png"
         Button:
             id: animal_icon
+            disabled: False if root.ids.animal_unlock.value==10 else True
             pos_hint: {"center_x": .75, "y": .5}
             on_press: animal_pack.state = "down"; root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
             size_hint: .35, .5
             background_color: 0, 0, 0, 0
             canvas.before:
                 Color:
-                    rgba: (1, 1, 1, 1)
+                    rgba: (1, 1, 1, 1) if self.disabled==False else (.8, .8, .8, .5)
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -559,10 +499,32 @@
         CheckBox:
             id: animal_pack
             group: "packs"
+            disabled: False if root.ids.animal_unlock.value==10 else True
             on_press: root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
             state: "down" if root.current_pack=="resources/packs/dieren/wordlist_animals.csv" else "normal"
             size_hint: .2, .2
             pos_hint: {"center_x": .75, "center_y": .35}
+        ProgressBar:
+            id: animal_unlock
+            max: 10
+            value: app.root.ids.gw.correct_words
+            size_hint: .4, .5
+            pos_hint: {"center_x": .75, "center_y": .25}
+#            canvas.after:
+#                Color:
+#                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1]
+#                BorderImage:
+#                    border: (12, 12, 12, 12)
+#                    pos: self.x, self.center_y - 12
+#                    size: self.width, 24
+#                    #source: 'blue.png'
+#                Color:
+#                    rgba: 1, 0, 0, 1
+#                BorderImage:
+#                    border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
+#                    pos: self.x, self.center_y - 12
+#                    size: self.width * (self.value / float(self.max)) if self.max else 0, 24
+#                    #source: 'red.png'
 
 
 
@@ -599,13 +561,13 @@
             pos: self.pos
             size: self.size
             source: self.bg
+
     name: "second"
 
     highscore_label: highscore_label
     wallet_label: wallet_label
 
-    secondary_color: .4,.4,.4,1
-    secondary_color2: 0,.7,.7,1
+
 
     letterBtn1: LetterBtn1
     letterBtn2: LetterBtn2
@@ -629,7 +591,7 @@
     next_button: next_button
 
     help_button: help_button
-    start_btn: start_btn
+    cd_label: cd_label
 
     imagewidget: imagewidget
     mainlanglabel: mainlanglabel
@@ -637,15 +599,15 @@
     i: 0
 
     id: AmbonWidget
+    main_color: AmbonWidget.main_color
+    secondary_color: (1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .8)
+    secondary_color2: 0,.7,.7,1
 
-    canvas:
-        Color:
-            rgba: ((249/255), (193/255), (109/255), .8)
-        RoundedRectangle:
-            pos: root.width/1.3, root.height/1.15
-            size: root.width/5, root.height/9
+
+
 
     Label:
+        id: score_label
         pos_hint: {'x': .868, 'y': .938}
         size: root.size
         text_size: self.width, self.height
@@ -653,7 +615,14 @@
         bold: True
         spacing: 3
         text: str(round(AmbonWidget.score))
-        background_color:
+        background_color: 0, 0, 0, 0
+        canvas.before:
+            Color:
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
+            RoundedRectangle:
+                pos: root.width/1.3, root.height/1.15
+                size: root.width/5, root.height/9
+
     Label:
         id: highscore_label
         pos_hint: {'x': .868, 'y': .878}
@@ -676,12 +645,14 @@
         background_color:
 
     Image:
+        id: coin_icon
         size_hint: .06, .06
         pos_hint: {'center_x': .82, 'center_y': .925}
         source: 'resources/icons/karucoins.png'
 
     Image:
-        size_hint: .06, .06
+        id: crown_icon
+        size_hint: .055, .055
         pos_hint: {'center_x': .82, 'center_y': .893}
         source: 'resources/icons/crown.png'
 
@@ -689,20 +660,20 @@
         id: mainlanglabel
         text: ''
         bold: True
-        font_size: 36
-        pos_hint: {'center_x': .5, 'center_y': .82}
+        font_size: 52
+        pos_hint: {'center_x': .5, 'center_y': .875}
     Image:
         id: imagewidget
         source: AmbonWidget.currentImage
         opacity: 0
-        size_hint: .4, .25
+        size_hint: .45, .35
         pos_hint: {'center_x': .5, 'center_y': .65}
         canvas.before:
             Color:
-                rgba: ((249/255), (193/255), (109/255), .8)
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
             RoundedRectangle:
-                size: 350, 350
-                pos: root.width/3.85, root.height/1.95
+                size: root.width*.55, root.height*.35
+                pos: self.x*.82, self.y
 
     Button: # Help Button
         id: help_button
@@ -711,11 +682,11 @@
         on_press: AmbonWidget.help()
         on_release: AmbonWidget.wordChecker()
         disabled: True if help_amount.text=='0' else False
-        size_hint: .125, .075
-        pos_hint: {"center_x": .4, "center_y": .125}
+        size_hint: .17, .1
+        pos_hint: {"center_x": .1, "center_y": .725}
         canvas.before:
             Color:
-                rgba: (1, 1, 1, 1) if self.state=='normal' else (AmbonWidget.secondary_color2)
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9 # if self.state=='normal' else 0,.7,.7,1
             RoundedRectangle:
                 size: help_button.size
                 pos: help_button.pos
@@ -723,15 +694,16 @@
     Label:
         id: help_amount
         text: str(AmbonWidget.hints)
+        color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
         size: self.size
         font_size: 35
-        pos_hint: {"center_x": .45, "center_y": .15}
+        pos_hint: {"center_x": .048, "center_y": .695}
         canvas.before:
             Color:
-                rgba: (.8, 0, 0, .75) if self.text!='0' else (.6, .6, .6, .75)
+                rgba: (1, 1, 1, 1) if self.text!='0' else (.6, .6, .6, .75)
             Ellipse:
                 size: 45, 45
-                pos: (self.width/2.378, self.height/7.5)
+                pos: help_button.x, help_button.y
 
     Button: # Sound Button
         id: sound_button
@@ -740,11 +712,11 @@
         clicked: 0
         disabled: True if sound_amount.text=='0' else False
         on_press: AmbonWidget.sound_used += 1; AmbonWidget.play_sound()
-        size_hint: .12, .07
-        pos_hint: {"center_x": .6, "center_y": .12}
+        size_hint: .15, .1
+        pos_hint: {"center_x": .1225, "center_y": .575}
         canvas.before:
             Color:
-                rgba: (1, 1, 1, 1) if self.state=='normal' else (AmbonWidget.secondary_color2)
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
@@ -752,68 +724,44 @@
     Label:
         id: sound_amount
         text: str(AmbonWidget.sound_hint)
+        color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
         size: self.size
         font_size: 35
-        pos_hint: {"center_x": .65, "center_y": .15}
+        pos_hint: {"center_x": .048, "center_y": .56}
         canvas.before:
             Color:
-                rgba: (.8, 0, 0, .75) if self.text!='0' else (.6, .6, .6, .75)
+                rgba: (1, 1, 1, 1) if self.text!='0' else (.6, .6, .6, .9) #
             Ellipse:
                 size: 45, 45
-                pos: (self.width/1.618, self.height/7.5)
+                pos: help_button.x, help_button.y*.8
 
     Button:
         id: pass_button
-        text: 'Pass'
         bold: True
         color: 1, 1, 1, 1
         background_color: 0, 0, 0, 0
         on_press: AmbonWidget.skip_level(); AmbonWidget.wordChecker()
         size_hint: .12, .07
-        pos_hint: {"center_x": .1, "center_y": .05}
+        pos_hint: {"center_x": .8875, "center_y": .65}
         canvas.before:
             Color:
-                rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (AmbonWidget.secondary_color2)
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9# if self.state=='normal' else 0,.7,.7,1
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
-
-
-
-
-#        canvas.after:
-#            Color:
-#                rgba: 1, 1, 1, 1
-#            RoundedRectangle:
-#                size: help_button.size
-#                pos: help_button.pos
-#                source: 'resources/icons/suggestion.png'
-#
-
-#    Label:
-#        id: karulabel
-#        color: 1,1,1
-#        text: AmbonWidget.karu.speech
-#        multiline: True
-#        bold: True
-#        font_size: 30 #root.width*.045
-#        text_size: self.size
-#        size_hint: .4, .175
-#        pos_hint:{"center_x": .6, "center_y": .2}
-#
-#    Image:
-#        source: 'resources/karu/karu.png'
-#        size_hint: .2, .2
-#        pos_hint:{"center_x":.27, "center_y":.125}
-
-
+            Color:
+                rgba: (1, 1, 1, .8)
+            RoundedRectangle:
+                pos: self.x*1.02225, self.y*1.015
+                size: self.width*.75, self.height*.75
+                source: 'resources/icons/skip.png'
 
     GridLayout:
         rows: 3
         cols: 6
         spacing: 15, 30
-        size_hint: .5, .15
-        pos_hint:{"center_x":.5, "center_y":.29}
+        size_hint: .6, .25
+        pos_hint:{"center_x":.5, "center_y":.2}
 
         LetterButton:
             id: LetterBtn1
@@ -926,48 +874,55 @@
 
     Button:
         id: next_button
-        text: '>'
+        text: ''
         opacity: 0
         on_press: AmbonWidget.click_button(); AmbonWidget.words()
-        size_hint: .2, .05
-        pos_hint:{"center_x":.5, "center_y":.3}
+        size_hint: .2, .075
+        pos_hint:{"center_x":.5, "center_y":.225}
         color: (.0,.0,.0,.0) if self.disabled else (1,1,1,1)
         background_color: 0,0,0,0
         canvas.before:
             Color:
-                rgba: (.021,.4,.006,.8) if self.state=='normal' else (.021,.4,.006,.9)  # visual feedback of press
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
             RoundedRectangle:
                 pos: self.pos
                 size: self.size
+            Color:
+                rgba: (1, 1, 1, .8)
+            RoundedRectangle:
+                pos: self.x*1.13, self.y*1.075
+                size: self.width*.5, self.height*.65
+                source: 'resources/icons/next.png'
     Button:
         id: menupop
         on_press: AmbonWidget.click_button(); AmbonWidget.game_pause = True; AmbonWidget.pause_time(); Factory.PopupMenu().open()
         on_release: print(AmbonWidget.game_pause)
         background_color: 0,0,0,0
-        size_hint: .1, .05
-        pos_hint:{"center_x":.1, "center_y":.94}
+        size_hint: .12, .07
+        pos_hint:{"center_x":.1, "center_y":.95}
         canvas.before:
             Color:
-                rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else AmbonWidget.secondary_color2
+                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9# if self.state=="normal" else 0,.7,.7,1
             RoundedRectangle:
                 size: menupop.size
                 pos: menupop.pos
         canvas.after:
             Color:
-                rgba: 1,1,1,1
+                rgba: 1,1,1,.8
             RoundedRectangle:
-                size: menupop.size
-                pos: menupop.pos
+                size: self.width*.65, self.height*.65
+                pos: menupop.x*1.5, menupop.y*1.0125
                 source: 'resources/icons/pause.png'
     Button:
-        id: start_btn
-        text: 'Raak het scherm aan\n   om te beginnen!'
+        id: cd_label
+        text: '3'
+        font_size: 86
         bold: True
         background_color: 0, 0, 0, .3
         size: root.size
         pos: root.pos
-        on_press: AmbonWidget.start_or_menu()#; AmbonWidget.game_pause = False; Clock.schedule_interval(AmbonWidget.menu_checker, .1)#; AmbonWidget.pause()
-        on_release: app.root.current = 'first' if AmbonWidget.go_to_menu else print(' '); AmbonWidget.reload() if AmbonWidget.go_to_menu else print(' ')
+#        on_press: AmbonWidget.start_or_menu()
+#        on_release: app.root.current = 'first' if AmbonWidget.go_to_menu else print(' '); AmbonWidget.reload() if AmbonWidget.go_to_menu else print(' ')
 
 
 <KaruHouse>:
