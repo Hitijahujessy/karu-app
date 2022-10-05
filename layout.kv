@@ -35,7 +35,7 @@
     orientation: 'vertical'
     size: root.width, root.height
     secondary_color: .4,.4,.4,1
-    secondary_color2: 0,.7,.7,1
+    secondary_color2: (1.1 - root.main_color[0], 1.1 - root.main_color[1], 1.1 - root.main_color[2], .8)
     #gw: app.root.ids.gw
     #highscore_menu: root.label_highscore
     #wallet_menu: root.label_wallet
@@ -58,7 +58,7 @@
         background_color: 0, 0, 0, 0
         canvas.after:
             Color:
-                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: start_button.width, start_button.height
                 pos: start_button.pos
@@ -79,7 +79,7 @@
         background_color: 0, 0, 0, 0
         canvas.after:
             Color:
-                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: ruma_button.width, ruma_button.height
                 pos: ruma_button.pos
@@ -99,7 +99,7 @@
         background_color: 0, 0, 0, 0
         canvas.after:
             Color:
-                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], .9] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: settings_button.width, settings_button.height
                 pos: settings_button.pos
@@ -110,7 +110,7 @@
                 pos: self.center_x*.865, self.center_y*.75
                 source: 'resources/icons/settings.png'
     Image:
-        source: 'resources/karu/logo_head.png'
+        source: root.skin
         size_hint: .75, .75
         pos_hint: {'center_x': .5, 'center_y': .8}
         canvas.before:
@@ -120,10 +120,12 @@
                 size: self.width, self.height*.6
                 pos: self.x, self.y*1.35
                 source: 'resources/karu/logo_rect.png'
+
     Image:
         source: 'resources/karu/logo_txt.png'
         size_hint: .75, .75
         pos_hint: {'center_x': .5, 'center_y': .8}
+
     Label:
         size_hint: .5, .1
         pos_hint: {'center_x': .5, 'center_y': .6}
@@ -159,16 +161,9 @@
 
 
 <LetterButton@Button>
-    background_color: 0,0,0,0  # the last zero is the critical on, make invisible
+    background_color: 0,0,0,0 # the last zero is the critical on, make invisible
     secondary_color2: 0,.7,.7,.8
-    on_press: self.state=='down'
-    opacity: 0
-#    canvas.before:
-#        Color:
-#            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
-#        RoundedRectangle:
-#            pos: self.pos
-#            size: self.size
+
 
 <WordButton@Button>:
     text: '_'
@@ -196,7 +191,7 @@
     size_hint_x: .9
     title: ""
     secondary_color: ((255/255), (167/255), 0, 1)
-    secondary_color2: 0,.7,.7,1
+    secondary_color2: (1.1 - app.root.ids.gw.main_color[0], 1.1 - app.root.ids.gw.main_color[1], 1.1 - app.root.ids.gw.main_color[2], .8)
     gw: app.root.ids.gw
 
 
@@ -264,7 +259,7 @@
             background_color: 0, 0, 0, 0
             canvas.after:
                 Color:
-                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1] if self.state=='normal' else root.secondary_color2
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
@@ -281,7 +276,7 @@
             background_color: 0, 0, 0, 0
             canvas.after:
                 Color:
-                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1] if self.state=='normal' else root.secondary_color2
                 RoundedRectangle:
                     size: self.size
                     pos: self.pos
@@ -300,7 +295,7 @@
     separator_color: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .75]
     gw: app.root.ids.gw
     main_color: self.gw.main_color
-    secondary_color2: 0,.7,.7,1
+    secondary_color2: (1.1 - app.root.ids.gw.main_color[0], 1.1 - app.root.ids.gw.main_color[1], 1.1 - app.root.ids.gw.main_color[2], .8)
 
     FloatLayout:
         Label:
@@ -331,7 +326,7 @@
                     rgba: 1,1,1,1
                 RoundedRectangle:
                     size: self.width/1.2, self.height/1.2
-                    pos: self.width/.385, self.height/.28
+                    pos: self.center_x*.86, self.y*1.0325
                     source: 'resources/icons/home.png'
         Button:
             text: ''
@@ -351,7 +346,7 @@
                     rgba: 1,1,1,1
                 RoundedRectangle:
                     size: self.width/1.5, self.height/1.5
-                    pos: self.width/.375, self.height/.205
+                    pos: self.center_x*.89, self.y*1.035
                     source: 'resources/icons/play.png'
 
 
@@ -406,7 +401,7 @@
 
 
 <BuyButton@Button>:
-    text: '   250'
+    text: ' 250'
     bold: True
     background_color: 0, 0, 0, 0
     backgroundnumber_buy: 1
@@ -417,7 +412,7 @@
 
     canvas.before:
         Color:
-            rgba: (.4,.4,.4,1) if self.state=='normal' else (0,.7,.7,1)
+            rgba: ([1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .9]) if self.state=='normal' else (0,.7,.7,1)
         RoundedRectangle:
             size: self.width, self.height
             pos: self.pos
@@ -425,26 +420,67 @@
         id: coin_icon
         source: 'resources/icons/karucoin_single.png' if self.disabled==False else 'resources/icons/check.png'
         size: 50, 50
-        pos: (root.x, root.y+15) if self.disabled==False else (root.x+40, root.y+15)
+        pos: (root.x+10, root.y+15) if self.disabled==False else (root.x+50, root.y+12.5)
         pos_hint: {'x':1, 'y':1}
 
+<BgBar@ProgressBar>:
+    max: 5
+    value: 1
+    size_hint: .4, .5
+    canvas.after:
+        Color:
+            rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+        BorderImage:
+            border: (12, 12, 12, 12)
+            pos: self.x, self.center_y - 12
+            size: self.width, 18
+            #source: 'blue.png'
+        Color:
+            rgba: app.root.ids.mainmenu.main_color
+        BorderImage:
+            border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
+            pos: self.x, self.center_y - 12
+            size: self.width * (self.value / float(self.max)) if self.max else 0, 18
 
 #: import Clock kivy.clock.Clock
 <PopupBg>:
     id: popupbg
+    title: '\n{}'.format(self.wallet)
+    title_align: "center"
+    title_size: 46
     size_hint_y: .65
     size_hint_x: .8
-    separator_color: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .75]
-    background_color: 0, 0, 0, 0
+    separator_color: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .75]
+    background_color: .7, .7, .7, .2#[1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+    overlay_color: 0, 0, 0, 0
     size_hint_y: .8
     size_hint_x: .9
-    secondary_color: ((255/255), (167/255), 0, 1)
+    secondary_color: 1, (167/255), 0, 1
     secondary_color2: 0,.7,.7,1
     gw: app.root.ids.gw
-    on_dismiss: app.root.ids.mainmenu.second_color()#; app.root.ids.gw.second_color()
+    on_open: app.root.ids.mainmenu.second_color()
+    #on_dismiss: app.root.ids.mainmenu.second_color()#; app.root.ids.gw.second_color()
 
     #kh: app.root.ids.kh
     #title: ('KaruCoins: ' + str(round(self.wallet)))
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, .75
+        Rectangle:
+            size: app.root.size
+            pos: app.root.pos
+        Color:
+            rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            size: self.width*.125, self.height*.075
+            pos: self.x*8.75, self.y*8.25
+            source: "resources/icons/karucoins.png"
+
 
 
 <PopupPacks>:
@@ -452,10 +488,23 @@
     size_hint_y: .5
     size_hint_x: .8
     kh: app.root.ids.kh
-    #current_pack:
-    title: ''#('KaruCoins: ' + str(round(self.wallet)))
-    #pack_name: ''
+    title: ''
+    title_size: 46
+    separator_color: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .75]
+    background_color: .7, .7, .7, .2
+    overlay_color: 0, 0, 0, 0
 
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, .75
+        Rectangle:
+            size: app.root.size
+            pos: app.root.pos
+        Color:
+            rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
 
     FloatLayout:
         size_hint: .25, .6
@@ -476,7 +525,7 @@
                     source: "resources/icons/house_pack_icon.png"
         Button:
             id: animal_icon
-            disabled: False if root.ids.animal_unlock.value==10 else True
+            disabled: False if root.ids.animal_unlock.value==root.ids.animal_unlock.max else True
             pos_hint: {"center_x": .75, "y": .5}
             on_press: animal_pack.state = "down"; root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
             size_hint: .35, .5
@@ -491,6 +540,9 @@
         CheckBox:
             id: house_pack
             group: "packs"
+            background_radio_normal: "resources/icons/check_inactive.png"
+            background_radio_down: "resources/icons/check_active.png"
+            color: app.root.ids.mainmenu.main_color[0], app.root.ids.mainmenu.main_color[1], app.root.ids.mainmenu.main_color[2], .9
             on_press: root.current_pack="resources/packs/huis/wordlist_house.csv" ; root.pack_switch()
             state: "down" if root.current_pack=="resources/packs/huis/wordlist_house.csv" else "normal"
             size_hint: .2, .2
@@ -499,54 +551,184 @@
         CheckBox:
             id: animal_pack
             group: "packs"
-            disabled: False if root.ids.animal_unlock.value==10 else True
+            background_radio_normal: "resources/icons/check_inactive.png"
+            background_radio_down: "resources/icons/check_active.png"
+            background_radio_disabled_normal: "resources/icons/check_inactive.png"
+            color: [app.root.ids.mainmenu.main_color[0], app.root.ids.mainmenu.main_color[1], app.root.ids.mainmenu.main_color[2], .9] if self.disabled==False else [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+            disabled: False if root.ids.animal_unlock.value==root.ids.animal_unlock.max else True
             on_press: root.current_pack="resources/packs/dieren/wordlist_animals.csv" ; root.pack_switch()
             state: "down" if root.current_pack=="resources/packs/dieren/wordlist_animals.csv" else "normal"
             size_hint: .2, .2
             pos_hint: {"center_x": .75, "center_y": .35}
         ProgressBar:
             id: animal_unlock
-            max: 10
+            max: 35
             value: app.root.ids.gw.correct_words
             size_hint: .4, .5
-            pos_hint: {"center_x": .75, "center_y": .25}
-#            canvas.after:
-#                Color:
-#                    rgba: [1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1]
-#                BorderImage:
-#                    border: (12, 12, 12, 12)
-#                    pos: self.x, self.center_y - 12
-#                    size: self.width, 24
-#                    #source: 'blue.png'
-#                Color:
-#                    rgba: 1, 0, 0, 1
-#                BorderImage:
-#                    border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
-#                    pos: self.x, self.center_y - 12
-#                    size: self.width * (self.value / float(self.max)) if self.max else 0, 24
-#                    #source: 'red.png'
+            pos_hint: {"center_x": .75, "center_y": .2}
+            canvas.after:
+                Color:
+                    rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+                BorderImage:
+                    border: (12, 12, 12, 12)
+                    pos: self.x, self.center_y - 12
+                    size: self.width, 18
+                    #source: 'blue.png'
+                Color:
+                    rgba: app.root.ids.mainmenu.main_color
+                BorderImage:
+                    border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
+                    pos: self.x, self.center_y - 12
+                    size: self.width * (self.value / float(self.max)) if self.max else 0, 18
+                    #source: 'red.png'
 
 
 
 
-<PopupOutfit@Popup>:
-    size_hint_y: .5
+<PopupOutfit>:
+    id: popupoutfits
+    size_hint_y: .6
     size_hint_x: .8
     kh: app.root.ids.kh
-    title: ''#('KaruCoins: ' + str(round(self.wallet)))
+    title: ''
+    title_size: 46
+    separator_color: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .75]
+    background_color: .7, .7, .7, .2
+    overlay_color: 0, 0, 0, 0
+    on_dismiss: app.root.ids.mainmenu.check_skin()
 
-    BoxLayout:
-        spacing: 15
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, .75
+        Rectangle:
+            size: app.root.size
+            pos: app.root.pos
+        Color:
+            rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+#    ScrollView:
+#        do_scroll_x: False
+#        do_scroll_y: True
+    FloatLayout:
+        pos_hint: {'x': .75, 'center_y': .475}
         Button:
-            text: "Coming soon..."
-            bold: True
-            on_press: print('COMING SOON')
-            font_size: 32
-            size: root.width/6, root.height/4
-            size_hint: None, None
-            pos: root.width/4, root.height/1.5
-            background_color: 0, 0, 0, .7
+            id: default_skin
+            on_press: default_skin2.state = "down"; root.current_skin="resources/skins/default.png" ; root.skin_switch()
+            size_hint: .35, .25
+            pos_hint: {"center_x": .25, "y": .725}
+            background_color: 0, 0, 0, 0
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "resources/skins/default_ico.png"
+        Button:
+            id: sunglasses_skin
+            disabled: False if root.ids.sunglasses_unlock.value==root.ids.sunglasses_unlock.max else True
+            pos_hint: {"center_x": .75, "y": .725}
+            on_press: sunglasses_skin2.state = "down"; root.current_skin="resources/skins/sunglasses.png"; root.skin_switch()
+            size_hint: .35, .25
+            background_color: 0, 0, 0, 0
+            canvas.after:
+                Color:
+                    rgba: (1, 1, 1, 1) if self.disabled==False else (.8, .8, .8, .5)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "resources/skins/sunglasses_ico.png"
+        CheckBox:
+            id: default_skin2
+            group: "skins"
+            background_radio_normal: "resources/icons/check_inactive.png"
+            background_radio_down: "resources/icons/check_active.png"
+            color: app.root.ids.mainmenu.main_color[0], app.root.ids.mainmenu.main_color[1], app.root.ids.mainmenu.main_color[2], .9
+            on_press: root.current_skin="resources/skins/default.png" ; root.skin_switch()
+            state: "down" if root.current_skin=="resources/skins/default.png" else "normal"
+            size_hint: .2, .2
+            pos_hint: {"center_x": .25, "center_y": .65}
 
+        CheckBox:
+            id: sunglasses_skin2
+            group: "skins"
+            background_radio_normal: "resources/icons/check_inactive.png"
+            background_radio_down: "resources/icons/check_active.png"
+            background_radio_disabled_normal: "resources/icons/check_inactive.png"
+            color: [app.root.ids.mainmenu.main_color[0], app.root.ids.mainmenu.main_color[1], app.root.ids.mainmenu.main_color[2], .9] if self.disabled==False else [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+            disabled: False if root.ids.sunglasses_unlock.value==root.ids.sunglasses_unlock.max else True
+            on_press: root.current_skin="resources/skins/sunglasses.png"; root.skin_switch()
+            state: "down" if root.current_skin=="resources/skins/sunglasses.png" else "normal"
+            size_hint: .2, .2
+            pos_hint: {"center_x": .75, "center_y": .65}
+        Label:
+            text: ''
+        ProgressBar:
+            id: sunglasses_unlock
+            max: 125
+            value: app.root.ids.gw.correct_words
+            size_hint: .4, .5
+            pos_hint: {"center_x": .75, "center_y": .575}
+            canvas.after:
+                Color:
+                    rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+                BorderImage:
+                    border: (12, 12, 12, 12)
+                    pos: self.x, self.center_y - 12
+                    size: self.width, 18
+                Color:
+                    rgba: app.root.ids.mainmenu.main_color
+                BorderImage:
+                    border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
+                    pos: self.x, self.center_y - 12
+                    size: self.width * (self.value / float(self.max)) if self.max else 0, 18
+        Button:
+            id: clown_skin
+            disabled: False if root.ids.clown_unlock.value==root.ids.clown_unlock.max else True
+            size_hint: .4, .3
+            pos_hint: {"center_x": .25, "y": .25}
+            on_press: clown_skin2.state = "down"; root.current_skin="resources/skins/clown.png"; root.skin_switch()
+            background_color: 0, 0, 0, 0
+            canvas.after:
+                Color:
+                    rgba: (1, 1, 1, 1) if self.disabled==False else (.8, .8, .8, .5)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: "resources/skins/clown_ico.png"
+        CheckBox:
+            id: clown_skin2
+            group: "skins"
+            background_radio_normal: "resources/icons/check_inactive.png"
+            background_radio_down: "resources/icons/check_active.png"
+            background_radio_disabled_normal: "resources/icons/check_inactive.png"
+            color: [app.root.ids.mainmenu.main_color[0], app.root.ids.mainmenu.main_color[1], app.root.ids.mainmenu.main_color[2], .9] if self.disabled==False else [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+            disabled: False if root.ids.clown_unlock.value==root.ids.clown_unlock.max else True
+            on_press: root.current_skin="resources/skins/clown.png"; root.skin_switch()
+            state: "down" if root.current_skin=="resources/skins/clown.png" else "normal"
+            size_hint: .2, .2
+            pos_hint: {"center_x": .25, "y": .1}
+        ProgressBar:
+            id: clown_unlock
+            max: 100
+            value: app.root.ids.gw.correct_words
+            size_hint: .4, .5
+            pos_hint: {"center_x": .25, "center_y": .125}
+            canvas.after:
+                Color:
+                    rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+                BorderImage:
+                    border: (12, 12, 12, 12)
+                    pos: self.x, self.center_y - 12
+                    size: self.width, 18
+                Color:
+                    rgba: app.root.ids.mainmenu.main_color
+                BorderImage:
+                    border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
+                    pos: self.x, self.center_y - 12
+                    size: self.width * (self.value / float(self.max)) if self.max else 0, 18
 
 
 <GameWidget>:
@@ -588,7 +770,7 @@
     letterBtn17: LetterBtn17
     letterBtn18: LetterBtn18
 
-    next_button: next_button
+    #next_button: next_button
 
     help_button: help_button
     cd_label: cd_label
@@ -601,7 +783,11 @@
     id: AmbonWidget
     main_color: AmbonWidget.main_color
     secondary_color: (1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .8)
-    secondary_color2: 0,.7,.7,1
+    secondary_color2: (1.1 - AmbonWidget.main_color[0], 1.1 - AmbonWidget.main_color[1], 1.1 - AmbonWidget.main_color[2], .8)#0,.7,.7,1
+
+    pass_button: pass_button.__self__
+    next_button: next_button.__self__
+    help_button: help_button.__self__
 
 
 
@@ -659,6 +845,7 @@
     Label:
         id: mainlanglabel
         text: ''
+        color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
         bold: True
         font_size: 52
         pos_hint: {'center_x': .5, 'center_y': .875}
@@ -686,7 +873,7 @@
         pos_hint: {"center_x": .1, "center_y": .725}
         canvas.before:
             Color:
-                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9 # if self.state=='normal' else 0,.7,.7,1
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: help_button.size
                 pos: help_button.pos
@@ -716,7 +903,7 @@
         pos_hint: {"center_x": .1225, "center_y": .575}
         canvas.before:
             Color:
-                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
@@ -740,12 +927,12 @@
         bold: True
         color: 1, 1, 1, 1
         background_color: 0, 0, 0, 0
-        on_press: AmbonWidget.skip_level(); AmbonWidget.wordChecker()
+        on_release: AmbonWidget.skip_level(); AmbonWidget.wordChecker()
         size_hint: .12, .07
         pos_hint: {"center_x": .8875, "center_y": .65}
         canvas.before:
             Color:
-                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9# if self.state=='normal' else 0,.7,.7,1
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
@@ -883,7 +1070,7 @@
         background_color: 0,0,0,0
         canvas.before:
             Color:
-                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 pos: self.pos
                 size: self.size
@@ -902,7 +1089,7 @@
         pos_hint:{"center_x":.1, "center_y":.95}
         canvas.before:
             Color:
-                rgba: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9# if self.state=="normal" else 0,.7,.7,1
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: menupop.size
                 pos: menupop.pos
@@ -930,7 +1117,7 @@
     orientation: 'vertical'
     size: root.width, root.height
     secondary_color: .4,.4,.4,.8
-    secondary_color2: 0,.7,.7,.8
+    secondary_color2: (1.1 - root.main_color[0], 1.1 - root.main_color[1], 1.1 - root.main_color[2], .8)
 
     canvas.before:
         Color:
@@ -942,61 +1129,81 @@
 
     Button:
         text: 'Achtergronden'
-        size: root.width/2, root.height/12
-        size_hint: None, None
+        size_hint: .2, .12
         on_release: Factory.PopupBg().open()
         pos_hint: {"center_x":.5, "center_y":.75}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas:
             Color:
-                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                size: self.width/1.3, self.height/1.3
+                pos: self.x*1.08, self.y*1.025
+                source: 'resources/icons/theme.png'
 
     Button:
         text: 'Categorieën'
-        size: root.width/2, root.height/12
-        size_hint: None, None
+        size_hint: .2, .12
         on_release: Factory.PopupPacks().open()
-        pos_hint: {"center_x":.5, "center_y":.65}
+        pos_hint: {"center_x":.5, "center_y":.6}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas:
             Color:
-                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                size: self.width/1.3, self.height/1.3
+                pos: self.x*1.04, self.y*1.025
+                source: 'resources/icons/categories.png'
 
     Button:
         text: 'Outfits'
-        size: root.width/2, root.height/12
-        size_hint: None, None
+        size_hint: .2, .12
         on_release: Factory.PopupOutfit().open()
-        pos_hint: {"center_x":.5, "center_y":.55}
+        pos_hint: {"center_x":.5, "center_y":.45}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas:
             Color:
-                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                size: self.width/1.2, self.height/1.2
+                pos: self.x*1.04, self.y*1.025
+                source: 'resources/icons/outfits.png'
 
 
     Button:
         text: "Menu"
         font_size: 32
         on_release: app.root.current = 'first'
-        size: root.width/2, root.height/12
-        size_hint: None, None
-        pos_hint: {"center_x":.5, "center_y":.4}
+        size_hint: .2, .12
+        pos_hint: {"center_x":.5, "center_y":.25}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas:
             Color:
-                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                size: self.width/1.2, self.height/1.2
+                pos: self.x*1.04, self.y*1.04
+                source: 'resources/icons/home.png'
 
 <SettingsScreen>:
     id: settings
@@ -1004,7 +1211,7 @@
     orientation: 'vertical'
     size: root.width, root.height
     secondary_color: .4,.4,.4,.8
-    secondary_color2: 0,.7,.7,.8
+    secondary_color2: (1.1 - root.main_color[0], 1.1 - root.main_color[1], 1.1 - root.main_color[2], .8)
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -1025,7 +1232,7 @@
         do_scroll_y: False
         canvas.before:
             Color:
-                rgba: (0, 0, 0, .25)
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1
             # Rectangle is the background
             RoundedRectangle:
                 pos: self.pos
@@ -1211,7 +1418,7 @@
         do_scroll_y: False
         canvas.before:
             Color:
-                rgba: (0, 0, 0, .25)
+                rgba: 1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1
             # Rectangle is the background
             RoundedRectangle:
                 pos: self.pos
@@ -1384,13 +1591,18 @@
         text: "Menu"
         font_size: 32
         on_release: app.root.current = 'first'
-        size: root.width/2, root.height/12
-        size_hint: None, None
-        pos: root.width/4, root.height/3.3
+        size_hint: .2, .12
+        pos_hint: {"center_x":.5, "center_y":.25}
         background_color: 0, 0, 0, 0
-        canvas.before:
+        canvas:
             Color:
-                rgba: root.secondary_color if self.state=='normal' else root.secondary_color2
+                rgba: [1 - root.main_color[0], 1 - root.main_color[1], 1 - root.main_color[2], 1] if self.state=='normal' else root.secondary_color2
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
+            Color:
+                rgba: 1, 1, 1, 1
+            RoundedRectangle:
+                size: self.width/1.2, self.height/1.2
+                pos: self.x*1.04, self.y*1.04
+                source: 'resources/icons/home.png'

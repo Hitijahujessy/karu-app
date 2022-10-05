@@ -67,8 +67,7 @@ class GameWidget(Screen, FloatLayout):
     broke_record = BooleanProperty(False)
     highscore_label = ObjectProperty()
 
-    correct_words = NumericProperty(store.get('data')[
-                                        'correct_words'])  # All correct words since playing, used to unlock categories and more in the future
+    correct_words = NumericProperty(store.get('data')[ 'correct_words'])  # All correct words since playing, used to unlock categories and more in the future
 
     wallet = NumericProperty(store.get('wallet')['coins'])
     wallet_label = ObjectProperty()  # In-game label where wallet is viewed
@@ -292,10 +291,11 @@ class GameWidget(Screen, FloatLayout):
         # turn button opacity to 1
         for x in range(18):
             letterBtn[x].opacity = 1
+            letterBtn[x].secondary_color2 = (1.1 - self.main_color[0], 1.1 - self.main_color[1], 1.1 - self.main_color[2], .8)
 
             if self.level == 0:
                 with letterBtn[x].canvas.before:
-                    Color(1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
+                    Color(1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .9)
                     RoundedRectangle(pos=letterBtn[x].pos, size=letterBtn[x].size)
         # Add possible characters to list including currentWord
         for x in range(letters_needed):
@@ -639,7 +639,7 @@ class GameWidget(Screen, FloatLayout):
 
     def stop_game(self):
 
-        self.stop_time()
+
 
         # If it took 30 seconds or longer to complete level, 5 points are rewarded (instead of 0 points, since the
         # answer was eventually correct)
@@ -664,11 +664,14 @@ class GameWidget(Screen, FloatLayout):
 
         print("Score: %s \nTime: %d\n" % (round(self.score), round(self.time)))
 
-        self.pay_coins()
-        self.high_score()
         self.time = 0  # Turn level time back to 0
 
-        self.go_to_menu = True
+        #self.go_to_menu = True
+        self.pay_coins()
+        self.high_score()
+
+        self.stop_time()
+
 
     def start_time(self):
 
@@ -682,6 +685,10 @@ class GameWidget(Screen, FloatLayout):
 
             Clock.unschedule(self.increment_time)
             print('Game is over')
+            self.high_score()
+            self.time = 0  # Turn level time back to 0
+
+            self.pay_coins()
             self.go_to_menu = True
             self.game_finish = True
 
@@ -728,7 +735,7 @@ class GameWidget(Screen, FloatLayout):
 
         elif not self.flawless:
 
-            self.coins += 50
+            self.coins += 5
 
         print("Earned %s coins" % self.coins)
         self.coins_total += self.coins
@@ -741,7 +748,6 @@ class GameWidget(Screen, FloatLayout):
             self.new_wallet -= self.coins_total
 
     def count_coins(self, dt):
-
 
         if self.coins_earned >= 1:
             self.coins_earned -= 1
@@ -764,8 +770,10 @@ class GameWidget(Screen, FloatLayout):
         coin_sound = SoundLoader.load(file)
 
         coin_sound.volume = .8
-        coin_sound.loop = True
-        coin_sound.play()
+        if self.coins_earned > 2:
+            coin_sound.loop = True
+        if self.coins_earned != 0:
+            coin_sound.play()
 
         def check_amount(dt):
 
@@ -787,17 +795,17 @@ class GameWidget(Screen, FloatLayout):
         Clock.schedule_interval(check_amount, .1)
 
     def high_score(self):
+        print("I'm highscore")
         if self.score > self.highscore:
-            store.put("data", highscore=self.score)
+            store["data"]["highscore"] = self.score
             self.highscore = store.get("data")["highscore"]
             self.highscore_label.text = str(self.highscore)
             self.broke_record = True
             print(f'hs:%d' % self.highscore)
             print(f'hs_old:%d' % self.old_highscore)
+            print(self.broke_record)
 
-        else:
-            print(self.score)
-            self.broke_record = False
+        print(self.broke_record)
 
     def reload(self):
 
@@ -921,18 +929,67 @@ class GameWidget(Screen, FloatLayout):
         except AttributeError:
             print(AttributeError)
 
-        self.remove_widget(self.ids.menupop)
-        self.remove_widget(self.ids.pass_button)
-        self.remove_widget(self.ids.sound_button)
-        self.remove_widget(self.ids.sound_amount)
-        self.remove_widget(self.ids.help_button)
-        self.remove_widget(self.ids.help_amount)
-        self.remove_widget(self.ids.pass_button)
-        self.remove_widget(self.ids.score_label)
-        self.remove_widget(self.ids.highscore_label)
-        self.remove_widget(self.ids.wallet_label)
-        self.remove_widget(self.ids.coin_icon)
-        self.remove_widget(self.ids.crown_icon)
+        try:
+            self.remove_widget(self.ids.menupop)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.pass_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.sound_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.sound_amount)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.help_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.help_amount)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.pass_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.score_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.highscore_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.wallet_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.remove_widget(self.ids.coin_icon)
+        except Exception as e:
+            print(e)
+
+
+        try:
+            self.remove_widget(self.ids.crown_icon)
+        except Exception as e:
+            print(e)
+
         try:
             self.remove_widget(self.next_button)
         except:
@@ -956,16 +1013,17 @@ class GameWidget(Screen, FloatLayout):
         print('start cd')
         if self.cd > 1:
             self.cd -= 1
-            self.cd_label.text = str(self.cd)
+            try:
+                self.cd_label.text = str(self.cd)
+            except Exception as e:
+                print(e)
+
             print(self.cd)
 
 
         elif self.cd == 1:
             self.start_or_menu()
             Clock.unschedule(self.countdown)
-
-
-
 
     def start_or_menu(self):
 
@@ -974,17 +1032,77 @@ class GameWidget(Screen, FloatLayout):
         self.reload()
 
         # add necessary widgets
-        self.add_widget(self.ids.menupop)
-        self.add_widget(self.ids.pass_button)
-        self.add_widget(self.ids.sound_button)
-        self.add_widget(self.ids.sound_amount)
-        self.add_widget(self.ids.help_button)
-        self.add_widget(self.ids.help_amount)
-        self.add_widget(self.ids.score_label)
-        self.add_widget(self.ids.highscore_label)
-        self.add_widget(self.ids.wallet_label)
-        self.add_widget(self.ids.coin_icon)
-        self.add_widget(self.ids.crown_icon)
+        try:
+            self.add_widget(self.ids.menupop)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.pass_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.sound_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.sound_amount)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.help_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.help_amount)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.pass_button)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.score_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.highscore_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.wallet_label)
+        except Exception as e:
+            print(e)
+
+        try:
+            self.add_widget(self.ids.coin_icon)
+        except Exception as e:
+            print(e)
+
+
+        try:
+            self.add_widget(self.ids.crown_icon)
+        except Exception as e:
+            print(e)
+        # self.add_widget(self.ids.menupop)
+        # self.add_widget(self.ids.pass_button)
+        # self.add_widget(self.ids.sound_button)
+        # self.add_widget(self.ids.sound_amount)
+        # self.add_widget(self.ids.help_button)
+        # self.add_widget(self.ids.help_amount)
+        # self.add_widget(self.ids.score_label)
+        # self.add_widget(self.ids.highscore_label)
+        # self.add_widget(self.ids.wallet_label)
+        # self.add_widget(self.ids.coin_icon)
+        # self.add_widget(self.ids.crown_icon)
 
         self.words()
         # self.go_to_menu = False
@@ -1004,25 +1122,27 @@ class Menu(Screen, BoxLayout):
     wallet = NumericProperty(store.get('wallet')['coins'])
     highscore = NumericProperty(store.get('data')['highscore'])
     main_color = ObjectProperty((1, 1, 1, 1))
+    skin = ObjectProperty(store.get("outfit")["current_outfit"])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.update_vars, .5)
         self.second_color()
+        self.check_skin()
 
     def update_vars(self, dt):
         self.wallet = store.get('wallet')['coins']
         self.highscore = store.get('data')['highscore']
 
     def second_color(self):
-
-        #from kivy.core.window import Window
-
         im = store.get("background")["current_bg"]
         m = Image.load(im, keep_data=True)
         self.main_color = m.read_pixel(20, 10)
         print(self.main_color)
 
+    def check_skin(self):
+        self.skin = store["outfit"]["current_outfit"]
+        print(self.skin)
 
 
 
@@ -1044,18 +1164,17 @@ class PopupBg(Popup):
 
     bg_buttons = []
     bg_buy_buttons = []
+    bg_bars = []
 
     bg = ObjectProperty(store.get('background')['current_bg'])
 
     unlocked_bg = store.get('unlocked_backgrounds')
+    unlocked_amount = NumericProperty(0)
 
     bg_index = 'bg' + str(backgroundnumber)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        floatlayout = FloatLayout()
-        title_label = Label(text=('KaruCoins: ' + str(round(self.wallet))))
 
         bg_scrollview = ScrollView(do_scroll_y=True, do_scroll_x=False)
 
@@ -1068,8 +1187,6 @@ class PopupBg(Popup):
                              pos_hint={'center_x': .5, 'center_y': .5}, spacing=(25, 25), padding=(50, 50, 50, 50))
         bg_grid.bind(minimum_height=bg_grid.setter('height'))
 
-        floatlayout.add_widget(title_label)
-        floatlayout.add_widget(bg_grid)
         bg_scrollview.add_widget(bg_grid)
         obj = InstructionGroup()
 
@@ -1102,26 +1219,44 @@ class PopupBg(Popup):
 
 
             for j in range(3):
-                btn_index = self.buy_backgroundnumber - 1
-                bg_buy_button = Factory.BuyButton()
-                self.bg_buy_buttons.append(bg_buy_button)
 
-                bg_grid.add_widget(self.bg_buy_buttons[btn_index])
-                self.bg_buy_buttons[btn_index].backgroundnumber_buy = self.buy_backgroundnumber
+                if self.buy_backgroundnumber < 10:
+                    btn_index = self.buy_backgroundnumber - 1
+                    bg_buy_button = Factory.BuyButton()
+                    self.bg_buy_buttons.append(bg_buy_button)
 
-                self.bg_buy_buttons[btn_index].bind(on_press=partial(self.update_value, self.buy_backgroundnumber), on_release=lambda y: self.checkout())
+                    bg_grid.add_widget(self.bg_buy_buttons[btn_index])
+                    self.bg_buy_buttons[btn_index].backgroundnumber_buy = self.buy_backgroundnumber
 
-                #self.verandervalue(new_val)
+                    self.bg_buy_buttons[btn_index].bind(on_press=partial(self.update_value, self.buy_backgroundnumber), on_release=lambda y: self.checkout())
+
+                    #self.verandervalue(new_val)
+
+                else:
+                    bar_index = self.buy_backgroundnumber - 10
+                    unlock_bar = Factory.BgBar()
+                    self.bg_bars.append(unlock_bar)
+                    if bar_index == 0:
+                        self.bg_bars[bar_index].max = 50
+                        self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                    elif bar_index == 1:
+                        self.bg_bars[bar_index].max = 125
+                        self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                    elif bar_index == 2:
+                        self.bg_bars[bar_index].max = 225
+                        self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                    bg_grid.add_widget(self.bg_bars[bar_index])
+
 
 
                 self.buy_backgroundnumber += 1
 
-        self.add_widget(floatlayout)
+        self.add_widget(bg_scrollview)
         print(self.unlocked_bg)
 
         # Loop to check which backgrounds are unlocked, so the buttons can be enabled and disabled where needed
         self.backgroundnumber = 1
-        for x in range(len(self.bg_buttons)):
+        for x in range(len(self.bg_buy_buttons)):
             try:
                 bg_index = 'bg' + str(self.backgroundnumber)
                 if self.unlocked_bg[bg_index]:
@@ -1130,9 +1265,22 @@ class PopupBg(Popup):
                     self.bg_buy_buttons[
                         x].disabled = True  # BuyButton also has to be disabled and the coin_icon should be
                     self.bg_buy_buttons[x].text = ''  # replaced with a check icon
+                    self.unlocked_amount += 1
+
 
                 if self.backgroundnumber != 9:
                     self.backgroundnumber += 1
+
+            except Exception as e:
+                print(repr(e))
+
+        for x in range(len(self.bg_bars)):
+            try:
+                bg_index = 'bg1' + str(x)
+                if self.unlocked_bg[bg_index]:
+                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_img)  # Remove lock button and img
+                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_button)
+                    self.unlocked_amount += 1
 
             except Exception as e:
                 print(repr(e))
@@ -1172,14 +1320,27 @@ class PopupBg(Popup):
         self.current_bg = self.backgroundnumber
 
         store.put("background", current_bg=packData.backgrounds[self.current_bg])
-        #GameWidget().bg = store["background"]["current_bg"]
-        # with GameWidget.canvas:
-        #     Color(1, 1, 1, 1)
-        #     Rectangle(source=store.get('background')['current_bg'], size=self.size, pos=self.pos)
 
+        KaruApp.WindowManager.ids.kh.second_color()
+        KaruApp.WindowManager.ids.mainmenu.second_color()
+        KaruApp.WindowManager.ids.gw.second_color()
+        KaruApp.WindowManager.ids.settings.second_color()
 
 class KaruHouse(Screen, BoxLayout):
-    pass
+
+    main_color = ObjectProperty((1, 1, 1, 1))
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.second_color()
+
+    def second_color(self):
+        # from kivy.core.window import Window
+
+        im = store.get("background")["current_bg"]
+        m = Image.load(im, keep_data=True)
+        self.main_color = m.read_pixel(20, 10)
+        print(self.main_color)
 
 
 class PopupMenu(Popup):
@@ -1187,15 +1348,35 @@ class PopupMenu(Popup):
 
 
 class PopupOutfit(Popup):
-    # data = packData
-    # wallet = store.get("wallet")["coins"]
-    pass
+    current_skin = ObjectProperty(store.get("outfit")["current_outfit"])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.skin_switch()
+
+    def skin_switch(self):
+        print(self.current_skin)
+        store["outfit"]["current_outfit"] = self.current_skin
+
 
 
 class SettingsScreen(Screen, BoxLayout):
     # Empty variables that will be filled using the flag buttons (see layout.kv line 951-1290)
     origin_lang = ""
     dest_lang = ""
+    main_color = ObjectProperty((1, 1, 1, 1))
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.second_color()
+
+    def second_color(self):
+        # from kivy.core.window import Window
+
+        im = store.get("background")["current_bg"]
+        m = Image.load(im, keep_data=True)
+        self.main_color = m.read_pixel(20, 10)
+        print(self.main_color)
 
     # Choose the origin language (would usually be user's native language)
     def choose_origin(self):
