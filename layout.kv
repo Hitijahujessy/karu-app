@@ -195,7 +195,7 @@
     gw: app.root.ids.gw
 
 
-    on_open: app.root.ids.gw.count_coins_anim(self.ids.karucoin); app.root.ids.gw.new_best_sound() if app.root.ids.gw.broke_record==True else print('')
+    on_open: app.root.ids.gw.count_coins_anim(self.ids.karucoin); app.root.ids.gw.new_best_sound() if app.root.ids.gw.broke_record==True else print(''); app.root.ids.gw.unlock_notification(self.ids.notification, self.ids.notification2)
 
     FloatLayout:
         size: app.root.size
@@ -234,7 +234,7 @@
             size_hint: .12, .125
             opacity: 1 if root.gw.broke_record==True else 0
         Label:
-            text: ' {}   >   {}'.format(root.gw.highscore, root.gw.old_highscore) if root.gw.broke_record==True else " {}".format(root.gw.score)
+            text: ' {}   >   {}'.format(root.gw.old_highscore, root.gw.highscore) if root.gw.broke_record==True else " {}".format(root.gw.score)
             valign: 'middle'
             font_size: 57
             pos_hint: {'center_x':.475, 'y':.18}
@@ -286,6 +286,47 @@
                     size: self.width/1.2, self.height/1.2
                     pos: self.width/.387, self.height/.545
                     source: 'resources/icons/home.png'
+
+        Label:
+            id: notification
+            text: '\nYou unlocked a new theme!'
+            valign: 'middle'
+            font_size: 27
+            color: 0, 0, 0, 1
+            pos_hint: {'center_x':.5, 'y':.75}
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, .8
+                RoundedRectangle:
+                    size: self.width, self.height*.125
+                    pos: self.x, self.y*1.5
+                Color:
+                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                RoundedRectangle:
+                    size: self.width/8, self.height/12
+                    pos: self.x*1.225, self.y*1.525
+                    source: 'resources/icons/theme.png'
+
+        Label:
+            id: notification2
+            text: '\nYou unlocked a new skin!'
+            valign: 'middle'
+            font_size: 27
+            color: 0, 0, 0, 1
+            pos_hint: {'center_x':.5, 'y':.75}
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, .8
+                RoundedRectangle:
+                    size: self.width, self.height*.125
+                    pos: self.x, self.y*1.5
+                Color:
+                    rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], 1
+                RoundedRectangle:
+                    size: self.width/8, self.height/12
+                    pos: self.x*1.225, self.y*1.525
+                    source: 'resources/icons/skins.png'
+
 
 <PopupMenu@Popup>
     auto_dismiss: False
@@ -597,6 +638,15 @@
     overlay_color: 0, 0, 0, 0
     on_dismiss: app.root.ids.mainmenu.check_skin()
 
+    default_skin: default_skin.__self__
+    default_skin2: default_skin2.__self__
+    sunglasses_skin: sunglasses_skin.__self__
+    sunglasses_skin2: sunglasses_skin2.__self__
+    sunglasses_unlock: sunglasses_unlock.__self__
+    clown_skin: clown_skin.__self__
+    clown_skin2: clown_skin2.__self__
+    clown_unlock: clown_unlock.__self__
+
     canvas.before:
         Color:
             rgba: 0, 0, 0, .75
@@ -712,7 +762,7 @@
             pos_hint: {"center_x": .25, "y": .1}
         ProgressBar:
             id: clown_unlock
-            max: 100
+            max: 75
             value: app.root.ids.gw.correct_words
             size_hint: .4, .5
             pos_hint: {"center_x": .25, "center_y": .125}
@@ -1182,7 +1232,7 @@
             RoundedRectangle:
                 size: self.width/1.2, self.height/1.2
                 pos: self.x*1.04, self.y*1.025
-                source: 'resources/icons/outfits.png'
+                source: 'resources/icons/skins.png'
 
 
     Button:

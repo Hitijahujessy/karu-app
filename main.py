@@ -807,6 +807,86 @@ class GameWidget(Screen, FloatLayout):
 
         print(self.broke_record)
 
+    def unlock_notification(self, notification, notification2, *largs):
+
+        x = 10
+        y = 2
+        first_unlock_theme = True
+        first_unlock_skin = True
+
+        skin_prices = [75, 125]
+        theme_prices = [50, 125, 225]
+
+        anim = Animation(pos_hint={'center_x': .5, 'y': .65}, duration=1)
+        anim += Animation(pos_hint={'center_x': .5, 'y': .65}, duration=2)
+        anim += Animation(pos_hint={'center_x': .5, 'y': .75}, duration=1)
+
+        # Check if theme is already unlocked
+        while x != 13:
+            index = 'bg{}'.format(x)
+            print(index)
+            if store["unlocked_backgrounds"][index]:
+                first_unlock_theme = False
+                print('already unlocked!')
+            elif not store["unlocked_backgrounds"][index]:
+                print("not unlocked, but are you ready?")
+                if theme_prices[x - 10] <= store["data"]["correct_words"]:
+                    first_unlock_theme = True
+                    store["unlocked_backgrounds"][index] = True
+                    print('first unlock!')
+                    store["unlocked_backgrounds"] = store["unlocked_backgrounds"]
+                    print(store["unlocked_backgrounds"][index])
+
+            if theme_prices[x-10] <= store["data"]["correct_words"]:
+                print("I got the keys to the door")
+                x += 1
+            else:
+                break
+
+        # Check if skin is already unlocked
+        while y != 4:
+            index = '{}'.format(y)
+            print(index)
+            if store["unlocked_skins"][index]:
+                first_unlock_skin = False
+                print('already unlocked!')
+            elif not store["unlocked_skins"][index]:
+                print("not unlocked, but are you ready?")
+                if skin_prices[y - 2] <= store["data"]["correct_words"]:
+                    first_unlock_skin = True
+                    store["unlocked_skins"][index] = True
+                    print('first unlock!')
+                    store["unlocked_skins"] = store["unlocked_skins"]
+                    print(store["unlocked_skins"][index])
+
+            if skin_prices[y - 2] <= store["data"]["correct_words"]:
+                print("I got the keys to the door")
+                y += 1
+            else:
+                break
+
+        if first_unlock_theme:
+
+            if theme_prices[0] <= store["data"]["correct_words"] or theme_prices[1] <= store["data"]["correct_words"] or theme_prices[2] <= store["data"]["correct_words"]:
+
+                anim.start(notification)
+
+                if first_unlock_skin:
+                    if skin_prices[0] <= store["data"]["correct_words"] or skin_prices[1] <= store["data"]["correct_words"]:
+                        notification2.pos_hint = {'center_x': .5, 'y': .65}
+                        notification2.opacity = 0
+                        anim = Animation(pos_hint={'center_x': .5, 'y': .65}, opacity=1, duration=.1)
+                        anim = Animation(pos_hint={'center_x': .5, 'y': .565}, opacity=1, duration=1)
+                        anim += Animation(pos_hint={'center_x': .5, 'y': .565}, opacity=1, duration=2)
+                        anim += Animation(pos_hint={'center_x': .5, 'y': .75}, opacity=0, duration=1)
+                        notification2.text = '\n\n' + notification2.text
+                        anim.start(notification2)
+
+        if first_unlock_skin:
+            if skin_prices[0] <= store["data"]["correct_words"] or skin_prices[1] <= store["data"]["correct_words"]:
+                anim.start(notification2)
+
+
     def reload(self):
 
         importlib.reload(packData)
@@ -1122,7 +1202,7 @@ class Menu(Screen, BoxLayout):
     wallet = NumericProperty(store.get('wallet')['coins'])
     highscore = NumericProperty(store.get('data')['highscore'])
     main_color = ObjectProperty((1, 1, 1, 1))
-    skin = ObjectProperty(store.get("outfit")["current_outfit"])
+    skin = ObjectProperty(store.get("skin")["current_skin"])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1141,13 +1221,16 @@ class Menu(Screen, BoxLayout):
         print(self.main_color)
 
     def check_skin(self):
-        self.skin = store["outfit"]["current_outfit"]
+        self.skin = store["skin"]["current_skin"]
         print(self.skin)
-
 
 
 class PopupPacks(Popup):
     current_pack = ObjectProperty(store.get("current_pack")["source"])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.current_pack = store.get("current_pack")["source"]
 
     def pack_switch(self):
         print(self.current_pack)
@@ -1182,6 +1265,7 @@ class PopupBg(Popup):
 
         self.bg_buttons = []
         self.bg_buy_buttons = []
+        self.bg_bars = []
 
         bg_grid = GridLayout(rows=(len(data.backgrounds)), cols=3, size_hint_x=1, size_hint_y=None,
                              pos_hint={'center_x': .5, 'center_y': .5}, spacing=(25, 25), padding=(50, 50, 50, 50))
@@ -1239,15 +1323,35 @@ class PopupBg(Popup):
                     if bar_index == 0:
                         self.bg_bars[bar_index].max = 50
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
+                            #self.bg_buttons[self.buy_backgroundnumber].
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = True
+                        else:
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = False
                     elif bar_index == 1:
                         self.bg_bars[bar_index].max = 125
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
+                            #self.bg_buttons[self.buy_backgroundnumber].
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = True
+                        else:
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = False
                     elif bar_index == 2:
                         self.bg_bars[bar_index].max = 225
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
+                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
+                            #self.bg_buttons[self.buy_backgroundnumber].
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = True
+                        else:
+                            bg_index = 'bg' + str(self.buy_backgroundnumber)
+                            self.unlocked_bg[bg_index] = False
+
                     bg_grid.add_widget(self.bg_bars[bar_index])
-
-
 
                 self.buy_backgroundnumber += 1
 
@@ -1256,7 +1360,7 @@ class PopupBg(Popup):
 
         # Loop to check which backgrounds are unlocked, so the buttons can be enabled and disabled where needed
         self.backgroundnumber = 1
-        for x in range(len(self.bg_buy_buttons)):
+        for x in range(len(self.bg_buy_buttons)+2):
             try:
                 bg_index = 'bg' + str(self.backgroundnumber)
                 if self.unlocked_bg[bg_index]:
@@ -1268,7 +1372,7 @@ class PopupBg(Popup):
                     self.unlocked_amount += 1
 
 
-                if self.backgroundnumber != 9:
+                if self.backgroundnumber != 12:
                     self.backgroundnumber += 1
 
             except Exception as e:
@@ -1348,15 +1452,16 @@ class PopupMenu(Popup):
 
 
 class PopupOutfit(Popup):
-    current_skin = ObjectProperty(store.get("outfit")["current_outfit"])
+    current_skin = ObjectProperty(store.get("skin")["current_skin"])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.skin_switch()
+
+        self.current_skin = store.get("skin")["current_skin"]
 
     def skin_switch(self):
         print(self.current_skin)
-        store["outfit"]["current_outfit"] = self.current_skin
+        store.put("skin", current_skin=self.current_skin)
 
 
 
