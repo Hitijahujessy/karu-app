@@ -51,8 +51,8 @@
 	    id: start_button
         text: "Start"
         font_size: 32
-        on_press: app.root.ids.gw.second_color(); app.root.ids.gw.reload();
-        on_release: app.root.current = "second"; Clock.schedule_interval(app.root.ids.gw.countdown, .5)
+        on_press: app.root.ids.gw.click_button()
+        on_release: app.root.ids.gw.second_color(); app.root.ids.gw.reload(); app.root.current = "second"; Clock.schedule_interval(app.root.ids.gw.countdown, .5)
         size_hint: .2, .12
         pos_hint: {"center_x": .4925, "center_y": .435}
         background_color: 0, 0, 0, 0
@@ -73,6 +73,7 @@
 	    id: ruma_button
         text: "Karu's huis"
         font_size: 32
+        on_press: app.root.ids.gw.click_button()
         on_release: app.root.current = 'third'
         size_hint: .2, .12
         pos_hint: {"center_x": .4925, "center_y": .3}
@@ -93,6 +94,7 @@
 	    id: settings_button
         text: "Instellingen"
         font_size: 32
+        on_press: app.root.ids.gw.click_button()
         on_release: app.root.current = 'fourth'
         size_hint: .2, .12
         pos_hint: {"center_x": .4925, "center_y": .165}
@@ -163,24 +165,32 @@
 <LetterButton@Button>
     background_color: 0,0,0,0 # the last zero is the critical on, make invisible
     secondary_color2: 0,.7,.7,.8
+    font_size: 36
 
 
 <WordButton@Button>:
     text: '_'
     bold: True
+    disabled: True if self.text=='_' else False
+    hint: False
     font_size: 42
+    color: 0, 0, 0, 0
     background_color: 0, 0, 0, 0
+    background_disabled_normal: ''
     disabled_color: 0, 0, 0, 0
     charpos: app.root.ids.gw.charpos
-    on_press: self.text = '_'; app.root.ids.gw.charpos==self.charpos; app.root.ids.gw.backspace()
+    secondary_color: (1, 1, 1, 1)#(1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .8)
+    #secondary_color2: (1.1 - app.root.ids.gw.main_color[0], 1.1 - app.root.ids.gw.main_color[1], 1.1 - app.root.ids.gw.main_color[2], .8)
+    on_press: self.text = '_'; self.color = (0,0,0,0); app.root.ids.gw.charpos==self.charpos; app.root.ids.gw.backspace()
     on_release: self.state='down'
     size_hint: .2, .2
-#    canvas.before:
-#        Color:
-#            rgba: ((249/255), (193/255), (109/255), .8) if self.state=='normal' else (0,.7,.7,.8)  # visual feedback of press
-#        RoundedRectangle:
-#            pos: self.pos
-#            size: self.size
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, .7) if self.state=='normal' else self.secondary_color  # visual feedback of press
+            #rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .8
+        RoundedRectangle:
+            pos: (self.x, self.y*1.125)
+            size: self.width, self.height*.5
 
 #:import Factory kivy.factory.Factory
 <PopupFinish@Popup>
@@ -251,8 +261,8 @@
             opacity: 0
         Button:
             text: ''
-            on_press: root.gw.reload(); Clock.schedule_interval(app.root.ids.gw.countdown, .5)
-            on_release:  root.dismiss()
+            on_press: root.gw.click_button()
+            on_release:  root.gw.reload(); Clock.schedule_interval(app.root.ids.gw.countdown, .5); root.dismiss()
             font_size: 32
             size_hint: .2, .12
             pos_hint: {'center_x':.5, 'y':.25}
@@ -270,6 +280,7 @@
                     pos: self.width/.387, self.height/.285
                     source: 'resources/icons/reload.png'
         Button:
+            on_press: root.gw.click_button()
             on_release: root.gw.reload(); root.dismiss(); app.root.current = 'first'
             size_hint: .2, .12
             pos_hint: {'center_x':.5, 'y':.05}
@@ -351,7 +362,7 @@
                     pos: root.pos
 
         Button:
-            on_press: root.gw.early_stop = 1; print('early stop')
+            on_press: root.gw.click_button(); root.gw.early_stop = 1; print('early stop')
             on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
             font_size: 32
             size_hint: .2, .12
@@ -371,7 +382,7 @@
                     source: 'resources/icons/home.png'
         Button:
             text: ''
-            on_press: root.gw.game_pause = False
+            on_press: root.gw.click_button(); root.gw.game_pause = False
             on_release:  root.dismiss(); root.gw.pause_time()
             font_size: 32
             size_hint: .2, .12
@@ -801,32 +812,32 @@
 
 
 
-    letterBtn1: LetterBtn1
-    letterBtn2: LetterBtn2
-    letterBtn3: LetterBtn3
-    letterBtn4: LetterBtn4
-    letterBtn5: LetterBtn5
-    letterBtn6: LetterBtn6
-    letterBtn7: LetterBtn7
-    letterBtn8: LetterBtn8
-    letterBtn9: LetterBtn9
-    letterBtn10: LetterBtn10
-    letterBtn11: LetterBtn11
-    letterBtn12: LetterBtn12
-    letterBtn13: LetterBtn13
-    letterBtn14: LetterBtn14
-    letterBtn15: LetterBtn15
-    letterBtn16: LetterBtn16
-    letterBtn17: LetterBtn17
-    letterBtn18: LetterBtn18
+    letter_btn1: letter_btn1
+    letter_btn2: letter_btn2
+    letter_btn3: letter_btn3
+    letter_btn4: letter_btn4
+    letter_btn5: letter_btn5
+    letter_btn6: letter_btn6
+    letter_btn7: letter_btn7
+    letter_btn8: letter_btn8
+    letter_btn9: letter_btn9
+    letter_btn10: letter_btn10
+    letter_btn11: letter_btn11
+    letter_btn12: letter_btn12
+    letter_btn13: letter_btn13
+    letter_btn14: letter_btn14
+    letter_btn15: letter_btn15
+    letter_btn16: letter_btn16
+    letter_btn17: letter_btn17
+    letter_btn18: letter_btn18
 
     #next_button: next_button
 
     help_button: help_button
     cd_label: cd_label
 
-    imagewidget: imagewidget
-    mainlanglabel: mainlanglabel
+    image_widget: image_widget
+    origin_label: origin_label
 
     i: 0
 
@@ -838,6 +849,8 @@
     pass_button: pass_button.__self__
     next_button: next_button.__self__
     help_button: help_button.__self__
+    sound_button: sound_button.__self__
+    cd_label: cd_label.__self__
 
 
 
@@ -893,15 +906,15 @@
         source: 'resources/icons/crown.png'
 
     Label:
-        id: mainlanglabel
+        id: origin_label
         text: ''
         color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
         bold: True
         font_size: 52
         pos_hint: {'center_x': .5, 'center_y': .875}
     Image:
-        id: imagewidget
-        source: AmbonWidget.currentImage
+        id: image_widget
+        source: AmbonWidget.current_image
         opacity: 0
         size_hint: .45, .35
         pos_hint: {'center_x': .5, 'center_y': .65}
@@ -916,8 +929,8 @@
         id: help_button
         color: 0, 0, 0, 0
         background_color: 0, 0, 0, 0
-        on_press: AmbonWidget.help()
-        on_release: AmbonWidget.wordChecker()
+        on_press: on_press: AmbonWidget.click_button()
+        on_release: AmbonWidget.help(); AmbonWidget.word_checker()
         disabled: True if help_amount.text=='0' else False
         size_hint: .17, .1
         pos_hint: {"center_x": .1, "center_y": .725}
@@ -931,7 +944,7 @@
     Label:
         id: help_amount
         text: str(AmbonWidget.hints)
-        color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
+        color: [1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9] if self.text!='0' else [1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .5]
         size: self.size
         font_size: 35
         pos_hint: {"center_x": .048, "center_y": .695}
@@ -948,7 +961,8 @@
         background_color: 0, 0, 0, 0
         clicked: 0
         disabled: True if sound_amount.text=='0' else False
-        on_press: AmbonWidget.sound_used += 1; AmbonWidget.play_sound()
+        on_press: AmbonWidget.click_button()
+        on_release:AmbonWidget.sound_used += 1; AmbonWidget.play_sound()
         size_hint: .15, .1
         pos_hint: {"center_x": .1225, "center_y": .575}
         canvas.before:
@@ -961,7 +975,7 @@
     Label:
         id: sound_amount
         text: str(AmbonWidget.sound_hint)
-        color: 1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9
+        color: [1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .9] if self.text!='0' else [1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .5]
         size: self.size
         font_size: 35
         pos_hint: {"center_x": .048, "center_y": .56}
@@ -977,7 +991,8 @@
         bold: True
         color: 1, 1, 1, 1
         background_color: 0, 0, 0, 0
-        on_release: AmbonWidget.skip_level(); AmbonWidget.wordChecker()
+        on_press: AmbonWidget.click_button()
+        on_release: AmbonWidget.skip_level(); AmbonWidget.word_checker()
         size_hint: .12, .07
         pos_hint: {"center_x": .8875, "center_y": .65}
         canvas.before:
@@ -1001,118 +1016,116 @@
         pos_hint:{"center_x":.5, "center_y":.2}
 
         LetterButton:
-            id: LetterBtn1
+            id: letter_btn1
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 0; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 0; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn2
+            id: letter_btn2
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 1; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 1; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn3
+            id: letter_btn3
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 2; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 2; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn4
+            id: letter_btn4
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 3; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 3; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn5
+            id: letter_btn5
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 4; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 4; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn6
+            id: letter_btn6
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 5; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 5; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn7
+            id: letter_btn7
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 6; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 6; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn8
+            id: letter_btn8
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 7; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 7; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn9
+            id: letter_btn9
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 8; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 8; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn10
+            id: letter_btn10
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 9; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 9; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn11
+            id: letter_btn11
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 10; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 10; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn12
+            id: letter_btn12
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 11; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 11; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn13
+            id: letter_btn13
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 12; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 12; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn14
+            id: letter_btn14
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 13; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 13; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn15
+            id: letter_btn15
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 14; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 14; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn16
+            id: letter_btn16
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 15; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 15; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn17
+            id: letter_btn17
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 16; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 16; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
         LetterButton:
-            id: LetterBtn18
+            id: letter_btn18
             text:
             bold: True
-            on_press: AmbonWidget.click_button(); AmbonWidget.i = 17; AmbonWidget.typeWord()
-            on_release: AmbonWidget.wordChecker()
+            on_press: AmbonWidget.click_button(); AmbonWidget.i = 17; AmbonWidget.type_word()
+            on_release: AmbonWidget.word_checker()
 
     Button:
         id: next_button
-        text: ''
-        opacity: 0
         on_press: AmbonWidget.click_button(); AmbonWidget.words()
         size_hint: .2, .075
         pos_hint:{"center_x":.5, "center_y":.225}
@@ -1180,6 +1193,7 @@
     Button:
         text: 'Achtergronden'
         size_hint: .2, .12
+        on_press: app.root.ids.gw.click_button()
         on_release: Factory.PopupBg().open()
         pos_hint: {"center_x":.5, "center_y":.75}
         background_color: 0, 0, 0, 0
@@ -1199,6 +1213,7 @@
     Button:
         text: 'Categorieën'
         size_hint: .2, .12
+        on_press: app.root.ids.gw.click_button()
         on_release: Factory.PopupPacks().open()
         pos_hint: {"center_x":.5, "center_y":.6}
         background_color: 0, 0, 0, 0
@@ -1218,6 +1233,7 @@
     Button:
         text: 'Outfits'
         size_hint: .2, .12
+        on_press: app.root.ids.gw.click_button()
         on_release: Factory.PopupOutfit().open()
         pos_hint: {"center_x":.5, "center_y":.45}
         background_color: 0, 0, 0, 0
@@ -1238,6 +1254,7 @@
     Button:
         text: "Menu"
         font_size: 32
+        on_press: app.root.ids.gw.click_button()
         on_release: app.root.current = 'first'
         size_hint: .2, .12
         pos_hint: {"center_x":.5, "center_y":.25}
@@ -1640,6 +1657,7 @@
     Button:
         text: "Menu"
         font_size: 32
+        on_press: app.root.ids.gw.click_button()
         on_release: app.root.current = 'first'
         size_hint: .2, .12
         pos_hint: {"center_x":.5, "center_y":.25}
