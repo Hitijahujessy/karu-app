@@ -1,9 +1,26 @@
 # Using kivy 2.0.0 and Python 3.8
+"""KaruApp - Motivate children to learn a new language
 
-import importlib
+KaruApp is an app that tries to motivate children to learn
+new languages by playing a quiz-like game.
+
+This app is created for
+smartphones/tablets in landscape mode, but .apk and .ipa versions are
+not available yet.
+
+KaruApp requires that 'kivy' and 'pandas' are installed to be able
+to run.
+
+*   Please note that the terms 'destination language' (or 'dest_lang') and
+    'origin language' (or origin_lang) are used to adress the language of the words
+    that the user wants to learn and the language that the user
+    already knows respectively. It is assumed that the user is going to type the answers in the
+    destination language, but this is not a requirement. The languages can be
+    switched freely and these terms are only used to differentiate between the two.
+"""
 import os
+import importlib
 from functools import partial
-
 import kivy
 
 from kivy.animation import Animation
@@ -41,14 +58,174 @@ root_widget = Builder.load_file('layout.kv')
 
 
 class GameWidget(Screen, FloatLayout):
+    """This class widget where the game takes place.
+
+    Arguments:
+    ----------
+    data : packData.py module
+    bg : str
+        The source of the current background
+    main_color : tuple
+        RGBA values of the current background
+    cd : int
+        Countdown time (defaults to 3)
+    time : float
+        Time per level in seconds
+    points : int
+        Maximum points per level (defaults to 40)
+    score : int
+        Total score
+    highscore : int
+        High score stored in user_data.json
+    old_highscore : int
+        Previous highscore (defaults to highscore's value)
+    broke_record : Bool
+        Used for checking if new a high score is achieved
+    wallet : int
+        Coins stored in user_data.json
+    new_wallet : int
+        Used for coin_count_anim() (defaults to wallet's value)
+    payout : int
+        Maximum amount of coins per level
+    coins : int
+        Coins earned in current level
+    coins_total : int
+        Coins earned in current game
+    coins_earned : int
+        Used for count_coins() (defaults to coins_total)
+    correct_words : int
+        All correct words since playing
+    letter_btn1-18 : button widget
+        All buttons used for typing
+    level_finish : bool
+        Used for checking if level is finished
+    game_finish : bool
+        Used for checking if game is finished
+    game_pause : bool
+        Used for checking if game is paused
+    early_stop : bool
+        Used for checking if game is stopped without finishing
+    word_list : dict
+        W word list in the destination language created in packData.py
+    origin_list : dict
+        Same word list as word_list, but in the origin language
+    index_list : list
+        A list containing the index of the current word list
+    level : int
+        The current level
+    index : int
+        The index of the word in the current level
+    current_word : str
+        The current word in the destination language
+    current_word_origin : str
+        The current word in the origin language
+    word : str
+        Used for removing ' ' and '-' without altering current_word
+    origin_label = ObjectProperty()  # Label showing current word in "main" language
+
+    image_widget = ObjectProperty(None)
+    current_image = data.pack_img[index]
+
+    letters_btn = current_word
+
+    emptyspace = ('_' * len(current_word))  # Used as text for word_buttons
+    grid = GridLayout()  # GridLayout containing the word_buttons
+    grid_exist = False
+    word_buttons = []
+    charpos = 0  # used for help and backspace
+
+    # Hints
+    hints = 5
+    hints_used = 0
+    sound_hint = 5
+    sound_used = 0
+
+    flawless = False  # Bool for checking if score is perfect (no hints, no mistakes)
+    mistakes = 0
+    answer_to_check = []  # Used for checking if user is finished with typing and if answer is correct
+    skip = False  # Bool for checking if level is skipped
+
+    Methods:
+    -------
+    proceed()
+        This function lets the game proceed to the next level.
+    word_letter_buttons()
+        This function randomizes letter_btns text and sets word_buttons text.
+    type_word()
+        This function lets the letter_btns be used for typing words.
+    backspace()
+        A function used for correcting typos.
+    hint()
+        This function reveals a letter as a hint.
+    skip_level()
+        This function allows the user to skip the current level.
+    victory_sound()
+        A function that plays a .wav file when an answer is correct.
+    incorrect_sound()
+        A function that plays a .wav file when an answer is incorrect.
+    play_sound()
+        A function that plays a .wav file when sound_button is pressed or when
+        level is completed/skipped.
+    click_button()
+        A function that plays a .wav file at every button press.
+    new_best_sound()
+        A function that plays a .wav file when new high score is achieved.
+    word_checker()
+        This function checks if user has finished typing an answer and
+        if said answer is correct.
+    increment_time(interval)
+        *Temporarily not used*
+        Used to keep time
+    stop_level()
+        This function calculates and awards points when a level is finished.
+    start_time(interval)
+        *Temporarily not used*
+        This function calls increment_time() using Kivy's Clock object
+    stop_game()
+        This function stops the game if game_finish is true. It also prevents
+        the high score and coins from being saved if user quits without finishing
+        the game.
+    pause_time()
+        *Temporarily not used*
+        This function pauses time when the pause popup is opened
+    pay_coins()
+        This function awards coins and saves those coins in the user_data.json
+        file.
+    count_coins(dt)
+        A function that is part of an animation. It allows the user to see their
+        wallet increase dynamically.
+    count_coins_anim(coin_ico, *largs)
+        A function that plays a simple animation. It shows how the coins move
+        from the in-game wallet label to the PopupFinish's new_wallet label.
+    high_score()
+        A function that checks if a new high score is achieved and saves that
+        new high score in the user_data.json file.
+    unlock_notification(notification, notification2, *largs)
+        A function that shows one or two notification if a new skin or
+        theme is unlocked.
+    reload():
+        This function resets most of the variables and widget-values.
+        Some widgets are added or removed.
+    second_color():
+        This function retrieves the main_color of the current background, which
+        is used to create accent colors. (This function exists in
+        all the screen widgets)
+    countdown(dt)
+        This function is used with the cd_label (countdown_label) to do a
+        countdown before the game starts.
+    start_game()
+        This function deletes and adds widgets, changes or resets variables and
+        runs necessary functions to enable the game to start.
+
+
+
+    """
 
     data = packData
 
-    bg = ObjectProperty(data.current_bg)  # ???
+    bg = ObjectProperty(data.current_bg)  # The current background
     main_color = ObjectProperty((1, 1, 1, 1))  # Used for setting accent colors
     cd = 3  # Countdown time
-
-    app_start = True  # ???
 
     time = NumericProperty()  # Time taken per level
 
@@ -58,7 +235,7 @@ class GameWidget(Screen, FloatLayout):
     old_highscore = NumericProperty(store.get('data')['highscore'])  # Used in end-game popup when new high score is
     # achieved
     broke_record = BooleanProperty(False)  # Bool for checking if new high score is achieved
-    highscore_label = ObjectProperty()  # Shows high score on menu screen and in-game
+    #highscore_label = ObjectProperty()  # Shows high score on menu screen and in-game
 
     wallet = NumericProperty(store.get('wallet')['coins'])
     wallet_label = ObjectProperty()
@@ -96,11 +273,7 @@ class GameWidget(Screen, FloatLayout):
     level_finish = False
     game_finish = False
     game_pause = BooleanProperty(True)
-    go_to_menu = False  # ???
     early_stop = 0  # ???
-
-    i = 0  # ???
-
     word_list = data.pack_dest
     origin_list = data.pack_origin  # Word list in language "main" language
     index_list = list(word_list.keys())  # Index of current word list
@@ -135,16 +308,20 @@ class GameWidget(Screen, FloatLayout):
     mistakes = 0
     answer_to_check = []  # Used for checking if user is finished with typing and if answer is correct
     skip = False  # Bool for checking if level is skipped
-    next_button = ObjectProperty(None)
-
-
 
     def __init__(self, **kwargs):
 
         super(GameWidget, self).__init__(**kwargs)
+        help(self.proceed)
 
-    # Function for changing words and images when proceeding to next level
-    def words(self):
+    def proceed(self):
+        """A function that lets the game proceed to the next level.
+
+        Widgets and variables that need to change to proceed to the next level are
+        changed. Only the 'next_button' widget is removed since it is only useable
+        after a level is finished or skipped. Once all of that is done, the function
+        'word_letter_btns()' is called.
+        """
 
         self.level_finish = False
 
@@ -292,12 +469,11 @@ class GameWidget(Screen, FloatLayout):
 
     # Function for typing words
     def type_word(self):
+        """Test docstring
 
-        # self.i turns into a tuple, causing an error. Not sure why this happens
-        if type(self.i) is tuple:
-            self.i = self.i[0]
-            int(self.i)
-
+        It's close to midnight, and something evil is lurking
+        from the dark. Hee-hee!
+        """
         letter_btn = [self.letter_btn1, self.letter_btn2, self.letter_btn3, self.letter_btn4, self.letter_btn5,
                       self.letter_btn6, self.letter_btn7, self.letter_btn8, self.letter_btn9, self.letter_btn10,
                       self.letter_btn11, self.letter_btn12, self.letter_btn13, self.letter_btn14, self.letter_btn15,
@@ -338,7 +514,7 @@ class GameWidget(Screen, FloatLayout):
                 print(e)
 
     # Function that reveals the first letter in line
-    def help(self):
+    def hint(self):
 
         self.hints_used += 1
         wordlength = len(self.emptyspace)
@@ -484,9 +660,9 @@ class GameWidget(Screen, FloatLayout):
 
                     self.index = self.index_list[self.level]  # Index +1 to go to next word
                     self.level_finish = True  # Level is finished
-                    self.stop_game()
+                    self.stop_level()
 
-                    self.add_widget(self.next_button)
+                    self.add_widget(self.ids.next_button)
                     self.ids.sound_button.disabled = True
                     self.ids.help_button.disabled = True
                     self.ids.pass_button.disabled = True
@@ -513,7 +689,7 @@ class GameWidget(Screen, FloatLayout):
                 # if True, game is finished
                 elif self.level >= 10:
                     self.game_finish = True
-                    self.stop_game()
+                    self.stop_level()
 
             # Answer incorrect
             else:
@@ -539,7 +715,7 @@ class GameWidget(Screen, FloatLayout):
         self.time += .1
 
     # Function used when level is finished, calculating and awarding a score
-    def stop_game(self):
+    def stop_level(self):
         if self.skip:
             self.score += 0
         elif self.hints_used >= 1 or self.mistakes >= 1 or self.sound_used:
@@ -555,7 +731,7 @@ class GameWidget(Screen, FloatLayout):
             self.flawless = True
 
         self.pay_coins()
-        self.stop_time()
+        self.stop_game()
 
     # See increment_time()
     def start_time(self):
@@ -565,14 +741,15 @@ class GameWidget(Screen, FloatLayout):
 
     # Stops the game if game is finished, also prevents saving new high score if quiting the game before completing
     # all levels
-    def stop_time(self):
+    def stop_game(self):
 
         if self.game_finish:
             Clock.unschedule(self.increment_time)
 
             self.high_score()
             popup = Factory.PopupFinish()
-            popup.open()
+            Clock.schedule_once(popup.open, 1)
+            #popup.open()
         elif self.early_stop:
             Clock.unschedule(self.increment_time)
             self.reload()
@@ -622,7 +799,7 @@ class GameWidget(Screen, FloatLayout):
             Clock.unschedule(self.count_coins)
 
     # A simple animation, shows the coins going from the wallet_label to the new_wallet in the end-game popup
-    def count_coins_anim(self, coin_ico):
+    def count_coins_anim(self, coin_ico, *largs):
 
         anim = Animation(opacity=0, duration=.01)
         anim += Animation(pos_hint={'center_x': .5, 'y': .55}, opacity=1, duration=.1)
@@ -668,7 +845,7 @@ class GameWidget(Screen, FloatLayout):
         if self.score > self.highscore:
             store["data"]["highscore"] = self.score
             self.highscore = store.get("data")["highscore"]
-            self.highscore_label.text = str(self.highscore)
+            self.ids.highscore_label.text = str(self.highscore)
             self.broke_record = True
             print(f'hs:%d' % self.highscore)
             print(f'hs_old:%d' % self.old_highscore)
@@ -761,7 +938,6 @@ class GameWidget(Screen, FloatLayout):
         importlib.reload(packData)
         self.data = packData
         self.bg = self.data.current_bg
-        self.app_start = True  # ???
 
         self.time = 0  # Time taken per level
 
@@ -776,7 +952,6 @@ class GameWidget(Screen, FloatLayout):
         # themes, categories and skins
 
         self.wallet = store.get('wallet')['coins']  # Coins saved in user_data.json
-        # self.wallet_label = ObjectProperty()  # In-game label where wallet is viewed
         self.new_wallet = self.wallet  # Used in the end-game popup's coin animation
         # self.payout = NumericProperty(10)  # Max amount of coins per level
 
@@ -790,7 +965,7 @@ class GameWidget(Screen, FloatLayout):
         self.level_finish = False  # Bool to check if current level is cleared
         self.game_finish = False  # Bool to check if game is finished
         self.game_pause = True  # Bool to check if game is paused
-        self.early_stop = 0  # ???
+        self.early_stop = False  # ???
 
         self.i = 0
 
@@ -947,7 +1122,7 @@ class GameWidget(Screen, FloatLayout):
             print(e)
 
         try:
-            self.remove_widget(self.next_button)
+            self.remove_widget(self.ids.next_button)
         except:
             print('No next_button to remove')
 
@@ -977,10 +1152,10 @@ class GameWidget(Screen, FloatLayout):
 
 
         elif self.cd == 1:
-            self.start_or_menu()
+            self.start_game()
             Clock.unschedule(self.countdown)
 
-    def start_or_menu(self):
+    def start_game(self):
 
         self.reload()
 
@@ -1056,10 +1231,11 @@ class GameWidget(Screen, FloatLayout):
         # self.add_widget(self.ids.coin_icon)
         # self.add_widget(self.ids.crown_icon)
 
-        self.words()
+        self.proceed()
         self.image_widget.opacity = 1
         self.ids.cd_label.text = str(self.cd)
         self.remove_widget(self.ids.cd_label)
+
 
 class Menu(Screen, BoxLayout):
     wallet = NumericProperty(store.get('wallet')['coins'])

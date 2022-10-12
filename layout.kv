@@ -1,6 +1,6 @@
 #: kivy 2.1.0
 #: import WipeTransition kivy.uix.screenmanager.WipeTransition
-#:import hex kivy.utils.get_color_from_hex
+#: import hex kivy.utils.get_color_from_hex
 #: import JsonStore kivy.storage.jsonstore
 #: import Clock kivy.clock.Clock
 #: import data packData
@@ -362,8 +362,8 @@
                     pos: root.pos
 
         Button:
-            on_press: root.gw.click_button(); root.gw.early_stop = 1; print('early stop')
-            on_release: root.gw.stop_time(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
+            on_press: root.gw.click_button(); root.gw.early_stop = True
+            on_release: root.gw.stop_game(); root.dismiss(); app.root.current = 'first'#; app.root.ids.mainmenu.highscore_menu.text = str(root.gw.highscore); app.root.ids.mainmenu.wallet_menu.text = str(root.gw.wallet)
             font_size: 32
             size_hint: .2, .12
             pos_hint: {'center_x': .5, 'y':.25}
@@ -807,11 +807,6 @@
 
     name: "second"
 
-    highscore_label: highscore_label
-    wallet_label: wallet_label
-
-
-
     letter_btn1: letter_btn1
     letter_btn2: letter_btn2
     letter_btn3: letter_btn3
@@ -831,14 +826,6 @@
     letter_btn17: letter_btn17
     letter_btn18: letter_btn18
 
-    #next_button: next_button
-
-    help_button: help_button
-    cd_label: cd_label
-
-    image_widget: image_widget
-    origin_label: origin_label
-
     i: 0
 
     id: AmbonWidget
@@ -846,6 +833,10 @@
     secondary_color: (1 - AmbonWidget.main_color[0], 1 - AmbonWidget.main_color[1], 1 - AmbonWidget.main_color[2], .8)
     secondary_color2: (1.1 - AmbonWidget.main_color[0], 1.1 - AmbonWidget.main_color[1], 1.1 - AmbonWidget.main_color[2], .8)#0,.7,.7,1
 
+    highscore_label: highscore_label.__self__
+    wallet_label: wallet_label.__self__
+    image_widget: image_widget.__self__
+    origin_label: origin_label.__self__
     pass_button: pass_button.__self__
     next_button: next_button.__self__
     help_button: help_button.__self__
@@ -930,7 +921,7 @@
         color: 0, 0, 0, 0
         background_color: 0, 0, 0, 0
         on_press: on_press: AmbonWidget.click_button()
-        on_release: AmbonWidget.help(); AmbonWidget.word_checker()
+        on_release: AmbonWidget.hint(); AmbonWidget.word_checker()
         disabled: True if help_amount.text=='0' else False
         size_hint: .17, .1
         pos_hint: {"center_x": .1, "center_y": .725}
@@ -1126,7 +1117,7 @@
 
     Button:
         id: next_button
-        on_press: AmbonWidget.click_button(); AmbonWidget.words()
+        on_press: AmbonWidget.click_button(); AmbonWidget.proceed()
         size_hint: .2, .075
         pos_hint:{"center_x":.5, "center_y":.225}
         color: (.0,.0,.0,.0) if self.disabled else (1,1,1,1)
@@ -1171,8 +1162,6 @@
         background_color: 0, 0, 0, .3
         size: root.size
         pos: root.pos
-#        on_press: AmbonWidget.start_or_menu()
-#        on_release: app.root.current = 'first' if AmbonWidget.go_to_menu else print(' '); AmbonWidget.reload() if AmbonWidget.go_to_menu else print(' ')
 
 
 <KaruHouse>:
