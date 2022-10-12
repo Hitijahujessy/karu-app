@@ -56,15 +56,76 @@ root_widget = Builder.load_file('layout.kv')
 
 # os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'  # Uncomment to prevent OpenGL error if necesarry
 
+# The parent widget
+class WindowManager(ScreenManager):
+    """This widget class allows the app to have multiple screens.
+
+    Every class that is not a Popup widget is the child widget of WindowManager.
+
+    """
+    pass
+
+
+class Menu(Screen, BoxLayout):
+    """ This widget class is the main menu of the app.
+
+    From here the user can see their wallet and high score. There are 3 buttons
+    leading to the game, store and settings screen. The logo contains the apps
+    mascotte, Karu. It's appearance can be changed in the store. The buttons'
+    colors can be changed there as well.
+
+    """
+    wallet = NumericProperty(store.get('wallet')['coins'])
+    highscore = NumericProperty(store.get('data')['highscore'])
+    main_color = ObjectProperty((1, 1, 1, 1))
+    skin = ObjectProperty(store.get("skin")["current_skin"])
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_interval(self.update_vars, .5)
+        self.second_color()
+        self.check_skin()
+
+    def update_vars(self, dt):
+        """This function is used to update the wallet- and high score labels.
+
+        """
+        self.wallet = store.get('wallet')['coins']
+        self.highscore = store.get('data')['highscore']
+
+    def second_color(self):
+        """This function is used for creating accent colors.
+
+                The rgba of a pixel from the current background is read using kivy's
+                Image.read_pixel() function and put in main_color. This will be used to
+                create accent colors.
+
+                This function exists in all the screen widgets to prevent NoneType errors.
+
+                """
+        im = store.get("background")["current_bg"]
+        m = Image.load(im, keep_data=True)
+        self.main_color = m.read_pixel(20, 10)
+        print(self.main_color)
+
+    def check_skin(self):
+        """This function is used to check the current skin.
+
+        This ensures that Karu's appearance is updated correctly.
+
+        """
+        self.skin = store["skin"]["current_skin"]
+        print(self.skin)
+
 
 class GameWidget(Screen, FloatLayout):
-    """This class widget where the game takes place.
+    """This widget class is where the game is located.
 
     Arguments:
     ----------
     data : packData.py module
     bg : str
-        The source of the current background
+        The path of the current background
     main_color : tuple
         RGBA values of the current background
     cd : int
@@ -121,29 +182,36 @@ class GameWidget(Screen, FloatLayout):
         The current word in the origin language
     word : str
         Used for removing ' ' and '-' without altering current_word
-    origin_label = ObjectProperty()  # Label showing current word in "main" language
-
-    image_widget = ObjectProperty(None)
-    current_image = data.pack_img[index]
-
-    letters_btn = current_word
-
-    emptyspace = ('_' * len(current_word))  # Used as text for word_buttons
-    grid = GridLayout()  # GridLayout containing the word_buttons
-    grid_exist = False
-    word_buttons = []
-    charpos = 0  # used for help and backspace
-
-    # Hints
-    hints = 5
-    hints_used = 0
-    sound_hint = 5
-    sound_used = 0
-
-    flawless = False  # Bool for checking if score is perfect (no hints, no mistakes)
-    mistakes = 0
-    answer_to_check = []  # Used for checking if user is finished with typing and if answer is correct
-    skip = False  # Bool for checking if level is skipped
+    current_image : str
+        The path of the image used in current level
+    letters_btn : str
+        The letters that are needed for letter_btns (defaults to current_word)
+    emptyspace : str
+        Used for checking how many un-typed characters exist in the answer
+    grid : GridLayout widget
+        A GridLayout for containing the word_buttons
+    grid_exist : bool
+        Used for checking if grid exists
+    word_buttons : list
+        A list containing the word_buttons
+    charpos : int
+        The position of where the next character will be typed
+    hints : int
+        The amount of available hints per game (defaults to 5)
+    hints_used : int
+        The amount of hints used per level
+    sound_hint : int
+        The amount of available sound hints per game (defaults to 5)
+    sound_used : int
+        The amount of sound hints used per level
+    flawless : bool
+        Used for checking if score is perfect (no hints, no mistakes)
+    mistakes : int
+        Amount of incorrect answers given per level
+    answer_to_check : list
+        Used for checking if user is finished with typing and if answer is correct
+    skip : bool
+        Used for checking if current level is skipped
 
     Methods:
     -------
@@ -235,10 +303,8 @@ class GameWidget(Screen, FloatLayout):
     old_highscore = NumericProperty(store.get('data')['highscore'])  # Used in end-game popup when new high score is
     # achieved
     broke_record = BooleanProperty(False)  # Bool for checking if new high score is achieved
-    #highscore_label = ObjectProperty()  # Shows high score on menu screen and in-game
 
     wallet = NumericProperty(store.get('wallet')['coins'])
-    wallet_label = ObjectProperty()
     new_wallet = wallet  # Used in the end-game popup's coin animation
     payout = NumericProperty(10)  # Max amount of coins per level
     coins = NumericProperty(0)  # Amount of coins earned in current level
@@ -285,9 +351,7 @@ class GameWidget(Screen, FloatLayout):
     current_word = word_list[index]
     current_word_origin = origin_list[index]
     word = ''  # Used to remove ' ' and '-' without altering current_word
-    origin_label = ObjectProperty()  # Label showing current word in "main" language
 
-    image_widget = ObjectProperty(None)
     current_image = data.pack_img[index]
 
     letters_btn = current_word
@@ -312,16 +376,18 @@ class GameWidget(Screen, FloatLayout):
     def __init__(self, **kwargs):
 
         super(GameWidget, self).__init__(**kwargs)
-        help(self.proceed)
+        #help(self.proceed)
 
     def proceed(self):
-        """A function that lets the game proceed to the next level.
+        """This function lets the game proceed to the next level.
 
-        Widgets and variables that need to change to proceed to the next level are
-        changed. Only the 'next_button' widget is removed since it is only useable
-        after a level is finished or skipped. Once all of that is done, the function
-        'word_letter_btns()' is called.
+        Widgets and variables that need to change to proceed to the next level
+        will be changed. Only the 'next_button' widget is removed since it is
+        only useable after a level is finished or skipped. Once all of that is
+        done, the function 'word_letter_btns()' is called.
+
         """
+
 
         self.level_finish = False
 
@@ -334,12 +400,12 @@ class GameWidget(Screen, FloatLayout):
 
         self.current_word = self.word_list[self.index]
         self.current_word_origin = self.origin_list[self.index]
-        self.origin_label.text = self.current_word_origin
+        self.ids.origin_label.text = self.current_word_origin
         self.current_image = self.data.pack_img[self.index]
         self.emptyspace = ('_' * len(self.current_word))
 
         self.letters_btn = self.current_word  # Set letter_btns letters to the letters needed for current level
-        self.image_widget.source = self.current_image  # Change image source to current_image
+        self.ids.image_widget.source = self.current_image  # Change image source to current_image
         self.ids.pass_button.disabled = False
         self.remove_widget(self.ids.next_button)
 
@@ -353,21 +419,18 @@ class GameWidget(Screen, FloatLayout):
 
     # Function that randomises letter_btns text and sets word_buttons text
     def word_letter_btns(self):
+        """This function randomizes letter_btns text and sets word_buttons text.
 
-        if not self.grid_exist:
-            self.grid = GridLayout(rows=1, cols=len(self.current_word), spacing=8, size_hint_x=.55, size_hint_y=.175,
-                                   pos_hint={'center_x': .5, 'center_y': .4})
-            self.add_widget(self.grid)
-            self.grid_exist = True
-        else:
-            self.answer_to_check = []
-            self.word_buttons = []
-            self.charpos = 0
-            self.grid.clear_widgets(children=None)
-            self.remove_widget(self.grid)
-            self.grid = GridLayout(rows=1, cols=len(self.current_word), spacing=8, size_hint_x=.55, size_hint_y=.175,
-                                   pos_hint={'center_x': .5, 'center_y': .4})
-            self.add_widget(self.grid)
+        The destination language will be checked because some languages use
+        different alphabets. The letters in current_word will be added to the
+        list letters_btn, together with random letters from one of the alphabets.
+        When the list contains 18 different characters, each of them will be
+        assigned to the letter_btns.
+
+        When that is done, the GridLayout containing word_buttons will be
+        created.
+
+        """
 
         if self.data.dest_lang == 'Russian':
             all_letters = list("абвгдеёжзийклмнопрстуфхцчшщъыьэюя")  # Possible letters for randomizing (Russian)
@@ -414,7 +477,7 @@ class GameWidget(Screen, FloatLayout):
                     Color(1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .9)
                     RoundedRectangle(pos=letter_btn[x].pos, size=letter_btn[x].size)
 
-        # Put possible characters in a list
+        # Put characters in a list
         for x in range(letters_needed):
 
             while True:
@@ -445,11 +508,27 @@ class GameWidget(Screen, FloatLayout):
         for x in range(len(self.letters_btn)):
             letter_btn[x].text = self.letters_btn[x]
 
+        # Create the grid and word_buttons
+        if not self.grid_exist:
+            self.grid = GridLayout(rows=1, cols=len(self.current_word), spacing=8, size_hint_x=.55, size_hint_y=.175,
+                                   pos_hint={'center_x': .5, 'center_y': .4})
+            self.add_widget(self.grid)
+            self.grid_exist = True
+        else:
+            self.answer_to_check = []
+            self.word_buttons = []
+            self.charpos = 0
+            self.grid.clear_widgets(children=None)
+            self.remove_widget(self.grid)
+            self.grid = GridLayout(rows=1, cols=len(self.current_word), spacing=8, size_hint_x=.55, size_hint_y=.175,
+                                   pos_hint={'center_x': .5, 'center_y': .4})
+            self.add_widget(self.grid)
         # Create the word_buttons
         for x in range(len(self.current_word)):
             word_button = Factory.WordButton()
             self.grid.add_widget(word_button)
-            word_button.secondary_color = (1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
+            word_button.secondary_color = (
+                1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
 
             # Used for correcting typos
             word_button.charpos = x
@@ -469,11 +548,16 @@ class GameWidget(Screen, FloatLayout):
 
     # Function for typing words
     def type_word(self):
-        """Test docstring
+        """This function lets the letter_btns be used for typing words.
 
-        It's close to midnight, and something evil is lurking
-        from the dark. Hee-hee!
+        A simple for-loop is used for typing. When a letter_btn is pressed, the
+        for-loop will iterate through the word_buttons until it comes across a
+        word_button that has the text value '_'. The word_button.text will be
+        changed to the letter_btn.text and then the loop will break. Dashes and
+        spaces are skipped.
+
         """
+
         letter_btn = [self.letter_btn1, self.letter_btn2, self.letter_btn3, self.letter_btn4, self.letter_btn5,
                       self.letter_btn6, self.letter_btn7, self.letter_btn8, self.letter_btn9, self.letter_btn10,
                       self.letter_btn11, self.letter_btn12, self.letter_btn13, self.letter_btn14, self.letter_btn15,
@@ -504,7 +588,12 @@ class GameWidget(Screen, FloatLayout):
 
     # Function used for replacing a typo
     def backspace(self):
+        """A function used for correcting typos.
 
+        This is a simple function that removes the text from a word_button and
+        sets the charpos to that button, allowing a typo to be fixes.
+
+        """
         old_charpos = self.charpos + 1
 
         if self.word_buttons[self.charpos] != '_':
@@ -515,6 +604,13 @@ class GameWidget(Screen, FloatLayout):
 
     # Function that reveals the first letter in line
     def hint(self):
+        """This function reveals a letter as a hint.
+
+        When the help_button is pressed, a for-loop will iterate through the
+        word_buttons until it comes across a word_button that has the text value '_'.
+        This button's text value will change to the correct letter for that button.
+
+        """
 
         self.hints_used += 1
         wordlength = len(self.emptyspace)
@@ -548,6 +644,13 @@ class GameWidget(Screen, FloatLayout):
 
     # Function that allows user to skip a level, preventing getting stuck without hints
     def skip_level(self):
+        """This function allows the user to skip the current level.
+
+        A for-loop is used to fill in every word_button with the text value '_'.
+        The letters filled in by the for-loop are in another color than the
+        letters that the user filled in if those letters were correct.
+
+        """
 
         self.skip = True
         wordlength = len(self.current_word)
@@ -573,6 +676,9 @@ class GameWidget(Screen, FloatLayout):
 
     # Play a sound if answer is correct
     def victory_sound(self):
+        """A function that plays a .wav file when an answer is correct.
+
+        """
 
         if not self.skip:
             press_sound = None  # Ensure that no sound is loaded
@@ -586,6 +692,9 @@ class GameWidget(Screen, FloatLayout):
 
     # Play a sound if answer is incorrect
     def incorrect_sound(self):
+        """A function that plays a .wav file when an answer is incorrect.
+
+        """
 
         press_sound = None  # Ensure that no sound is loaded
         file = 'resources/Sounds/incorrect.wav'
@@ -595,6 +704,10 @@ class GameWidget(Screen, FloatLayout):
         press_sound.play()
 
     def play_sound(self):
+        """A function that plays a .wav file when sound_button is pressed, or when
+        the level is completed/skipped.
+
+        """
 
         button_sound = None  # Ensure that no sound is loaded
 
@@ -617,6 +730,9 @@ class GameWidget(Screen, FloatLayout):
 
     # Play sound on button press
     def click_button(self):
+        """A function that plays a .wav file at every button press.
+
+        """
 
         press_sound = None  # Ensure that no sound is loaded
         file = 'resources/Sounds/click_button.wav'
@@ -627,6 +743,9 @@ class GameWidget(Screen, FloatLayout):
 
     # Play sound when new high score is achieved
     def new_best_sound(self):
+        """A function that plays a .wav file when new high score is achieved.
+
+        """
 
         victory_sound = None  # Ensure that no sound is loaded
         file = 'resources/Sounds/victory.wav'
@@ -637,6 +756,19 @@ class GameWidget(Screen, FloatLayout):
 
     # Function that checks if given answer is correct
     def word_checker(self):
+        """This function checks if user has finished typing an answer and
+        if said answer is correct.
+
+        First, the answer_to_check list will be filled with the word_buttons text
+        using a for-loop. After the list in joined into a string, it will go
+        through an if-statement to check if the answer is complete. Then,
+        answer_to_check will be checked if the answer is correct. If it is, the
+        user may proceed to the next level, unless the current level is the final
+        level. If the answer was incorrect, the word_buttons' text will be reset
+        with an exception of word_buttons that were filled in by the help()
+        function.
+
+        """
 
         self.answer_to_check = []
 
@@ -711,11 +843,19 @@ class GameWidget(Screen, FloatLayout):
     # in the code
     # since I'm planning to make use of these functions at a later time.
     def increment_time(self, interval):
+        """*Temporarily not used*
+
+        Used to keep time
+
+        """
 
         self.time += .1
 
     # Function used when level is finished, calculating and awarding a score
     def stop_level(self):
+        """This function calculates and awards points when a level is finished.
+
+            """
         if self.skip:
             self.score += 0
         elif self.hints_used >= 1 or self.mistakes >= 1 or self.sound_used:
@@ -733,8 +873,14 @@ class GameWidget(Screen, FloatLayout):
         self.pay_coins()
         self.stop_game()
 
+
     # See increment_time()
     def start_time(self):
+        """*Temporarily not used*
+
+        This function calls increment_time() using Kivy's Clock object
+
+        """
 
         self.time = 0
         Clock.schedule_interval(self.increment_time, .1)
@@ -742,6 +888,12 @@ class GameWidget(Screen, FloatLayout):
     # Stops the game if game is finished, also prevents saving new high score if quiting the game before completing
     # all levels
     def stop_game(self):
+        """This function stops the game if game_finish is true.
+
+        It also prevents the high score and coins from being saved if user quits
+        without finishingthe game.
+
+        """
 
         if self.game_finish:
             Clock.unschedule(self.increment_time)
@@ -758,6 +910,11 @@ class GameWidget(Screen, FloatLayout):
 
     # The name explains itself, see increment_time()
     def pause_time(self):
+        """*Temporarily not used*
+
+        This function pauses time when the pause popup is opened
+
+        """
 
         if not self.game_finish:
 
@@ -770,6 +927,13 @@ class GameWidget(Screen, FloatLayout):
 
     # Awards and saves coins
     def pay_coins(self):
+        """This function awards coins and saves those coins in the user_data.json
+        file.
+
+        Coins are not saved if the user quits the game before finishing it and no
+        coins are awarded if the user skips the level.
+
+        """
 
         if self.skip:
             self.coins += 0
@@ -790,6 +954,12 @@ class GameWidget(Screen, FloatLayout):
 
     # Function allowing the user to see their wallet increase dynamically, part of the coin animation
     def count_coins(self, dt):
+        """A function that i allows the user to see their wallet increase
+        dynamically.
+
+        This function is used together with count_coins_anim
+
+        """
 
         if self.coins_earned >= 1:
             self.coins_earned -= 1
@@ -800,6 +970,14 @@ class GameWidget(Screen, FloatLayout):
 
     # A simple animation, shows the coins going from the wallet_label to the new_wallet in the end-game popup
     def count_coins_anim(self, coin_ico, *largs):
+        """A function that plays a simple animation.
+
+        It shows how the coins move from the in-game wallet label to the
+        PopupFinish's new_wallet label.
+
+        :param class coin_ico: the widget that needs to be animated
+
+        """
 
         anim = Animation(opacity=0, duration=.01)
         anim += Animation(pos_hint={'center_x': .5, 'y': .55}, opacity=1, duration=.1)
@@ -822,6 +1000,11 @@ class GameWidget(Screen, FloatLayout):
 
         # Make sure the coin sounds and animation are timed as good as possible
         def check_amount(dt):
+            """ This is a simple function that makes sure that the animation and
+            sounds are timed correctly, depending on the amount of coins left to
+            add to the new_wallet.
+
+            """
 
             if self.coins_earned == 2:
                 coin_sound.stop()
@@ -841,7 +1024,13 @@ class GameWidget(Screen, FloatLayout):
         Clock.schedule_interval(check_amount, .1)
 
     def high_score(self):
-        print("I'm highscore")
+        """A function that checks if a new high score is achieved
+
+        If a new high score is achieved it will be saved to user_data.json,
+        unless the game has been stopped before finishing it.
+
+        """
+
         if self.score > self.highscore:
             store["data"]["highscore"] = self.score
             self.highscore = store.get("data")["highscore"]
@@ -854,6 +1043,16 @@ class GameWidget(Screen, FloatLayout):
         print(self.broke_record)
 
     def unlock_notification(self, notification, notification2, *largs):
+        """A function that shows one or two notification if a new skin or
+        theme is unlocked.
+
+        While-loops and if-statements are used to check if the skin/theme is
+        already unlocked and to unlock it if necesarry.
+
+        :param class notification: The notification bar that needs to be animated
+        :param class notification2: The notification bar that needs to be animated
+
+        """
 
         x = 10
         y = 2
@@ -934,6 +1133,13 @@ class GameWidget(Screen, FloatLayout):
                 anim.start(notification2)
 
     def reload(self):
+        """This function resets the game.
+
+        Most of the variables and widget-values will be reset and sp,e of the
+        widgets are added or removed. There are a lot of unnecesarry try-except
+        blocks that will be replaced in a future update.
+
+        """
 
         importlib.reload(packData)
         self.data = packData
@@ -973,14 +1179,14 @@ class GameWidget(Screen, FloatLayout):
         self.word_list = self.data.pack_dest  # Word list in language that is being learned
         self.index_list = list(self.word_list.keys())  # Index of current word list
         random.shuffle(self.index_list)  # Randomize word order
-        self.level = 9  # Current level
+        self.level = 0  # Current level
         self.index = self.index_list[self.level]  # Index of word used in current level
 
         # Words for current level
         self.current_word = self.word_list[self.index]
         self.current_word_origin = self.origin_list[self.index]
         self.word = ''
-        self.origin_label.text = ''  # Remove label text to prevent it from showing up during countdown
+        self.ids.origin_label.text = ''  # Remove label text to prevent it from showing up during countdown
 
         self.current_image = self.data.pack_img[self.index]  # Image for current level
 
@@ -1037,7 +1243,7 @@ class GameWidget(Screen, FloatLayout):
         self.letters_btn = self.current_word
 
         try:
-            self.image_widget.source = self.current_image
+            self.ids.image_widget.source = self.current_image
         except AttributeError:
             print(AttributeError)
 
@@ -1057,7 +1263,7 @@ class GameWidget(Screen, FloatLayout):
             print(AttributeError)
 
         try:
-            self.image_widget.opacity = 0
+            self.ids.image_widget.opacity = 0
         except AttributeError:
             print(AttributeError)
 
@@ -1132,6 +1338,15 @@ class GameWidget(Screen, FloatLayout):
             print('cd_label already exists')
 
     def second_color(self):
+        """This function is used for creating accent colors.
+
+        The rgba of a pixel from the current background is read using kivy's
+        Image.read_pixel() function and put in main_color. This will be used to
+        create accent colors.
+
+        This function exists in all the screen widgets to prevent NoneType errors.
+
+        """
 
         im = store.get("background")["current_bg"]
         m = Image.load(im, keep_data=True)
@@ -1140,7 +1355,10 @@ class GameWidget(Screen, FloatLayout):
 
     # Countdown till game starts
     def countdown(self, dt):
-        print('start cd')
+        """This function is used for a countdown before the game starts.
+
+        """
+
         if self.cd > 1:
             self.cd -= 1
             # try:
@@ -1156,6 +1374,14 @@ class GameWidget(Screen, FloatLayout):
             Clock.unschedule(self.countdown)
 
     def start_game(self):
+        """This function is used to start the game.
+
+        It deletes and adds widgets, changes or resets variables and
+        runs necessary functions to enable the game to start. Like the reload()
+        function, there are a lot of try-except blocks that still need to be
+        replaced.
+
+        """
 
         self.reload()
 
@@ -1232,52 +1458,48 @@ class GameWidget(Screen, FloatLayout):
         # self.add_widget(self.ids.crown_icon)
 
         self.proceed()
-        self.image_widget.opacity = 1
+        self.ids.image_widget.opacity = 1
         self.ids.cd_label.text = str(self.cd)
         self.remove_widget(self.ids.cd_label)
 
 
-class Menu(Screen, BoxLayout):
-    wallet = NumericProperty(store.get('wallet')['coins'])
-    highscore = NumericProperty(store.get('data')['highscore'])
+# Location of PopupBg, PopupSkins and PopupPacks
+class KaruStore(Screen, BoxLayout):
+    """This widget class is where the popups for the themes, skins and word
+    packs are located.
+
+    """
     main_color = ObjectProperty((1, 1, 1, 1))
-    skin = ObjectProperty(store.get("skin")["current_skin"])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        Clock.schedule_interval(self.update_vars, .5)
         self.second_color()
-        self.check_skin()
-
-    def update_vars(self, dt):
-        self.wallet = store.get('wallet')['coins']
-        self.highscore = store.get('data')['highscore']
 
     def second_color(self):
+        """This function is used for creating accent colors.
+
+        The rgba of a pixel from the current background is read using kivy's
+        Image.read_pixel() function and put in main_color. This will be used to
+        create accent colors.
+
+        This function exists in all the screen widgets to prevent NoneType errors.
+
+        """
+
         im = store.get("background")["current_bg"]
         m = Image.load(im, keep_data=True)
         self.main_color = m.read_pixel(20, 10)
-        print(self.main_color)
-
-    def check_skin(self):
-        self.skin = store["skin"]["current_skin"]
-        print(self.skin)
-
-
-class PopupPacks(Popup):
-    current_pack = ObjectProperty(store.get("current_pack")["source"])
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.current_pack = store.get("current_pack")["source"]
-
-    def pack_switch(self):
-        print(self.current_pack)
-        store.put("current_pack", source=self.current_pack)
 
 
 # Popup for unlocking and changing backgrounds
 class PopupBg(Popup):
+    """This class is the Popup widget where themes can be unlocked and changed.
+
+    In the code of KaruApp and it's modules,you will find a lot of refferences to
+    'themes' and to 'backgrounds'. These are one and the same (except for the
+    background values and functions from Kivy). The term  'background' will be
+    completely replaced by 'theme' in a future update"""
+
     data = packData
     wallet = ObjectProperty(store.get("wallet")["coins"])
     backgroundnumber = 1
@@ -1296,6 +1518,14 @@ class PopupBg(Popup):
     bg_index = 'bg' + str(backgroundnumber)
 
     def __init__(self, **kwargs):
+        """This __init__ function makes sure that the layout is correct.
+
+        All necesarry buttons and progress bars are added using for-loops.
+        It will also check which buttons need to be unlocked and assign the
+        correct values to the progress bars. The button containing the current
+        background will be highlighted.
+
+        """
         super().__init__(**kwargs)
 
         bg_scrollview = ScrollView(do_scroll_y=True, do_scroll_x=False)
@@ -1428,13 +1658,32 @@ class PopupBg(Popup):
                 print(repr(e))
 
     def update_value(self, val, *largs):
+        """This function corrects the value of the backgroundnumbers
+
+        Backgroundnumber and buy_backgroundnumber keep the value of the last
+        button that is created. This function prevents that from happening, by
+        changing their values to 'val'. which is the (buy_)backgroundnumber of
+        the button from when it was created.
+
+        :param int val: the correct (buy_)backgroundnumber
+
+        """
         print(f'value is %d' % val)
         print(f'bg no is %d' % self.backgroundnumber)
         self.backgroundnumber = val
         self.buy_backgroundnumber = val
 
     def checkout(self):
-        print('checking out')
+        """This function unlocks themes using KaruCoins (KC)
+
+        Every theme costs 250KC. An if-statement will check if the amount of
+        coins in the wallet exceeds the price and unlocks the theme if it does.
+
+        When a theme is unlocked, the 'lock button' is removed, the buy button
+        is disabled and changed to a 'check' icon, the theme is saved in
+        user_data.json and the coins are taken out of the wallet.
+
+        """
         price = 250
         btn_in_list = self.buy_backgroundnumber - 1
 
@@ -1456,51 +1705,79 @@ class PopupBg(Popup):
             store["unlocked_backgrounds"] = store["unlocked_backgrounds"]
 
     def background_change(self, *largs):
+        """This is a simple function that changes and saves the current background
+
+        """
         btn_in_list = self.backgroundnumber - 1
         self.current_bg = self.backgroundnumber
 
         store.put("background", current_bg=packData.backgrounds[self.current_bg])
 
-        KaruApp.WindowManager.ids.kh.second_color()
+        KaruApp.WindowManager.ids.ks.second_color()
         KaruApp.WindowManager.ids.mainmenu.second_color()
         KaruApp.WindowManager.ids.gw.second_color()
         KaruApp.WindowManager.ids.settings.second_color()
 
 
-class KaruHouse(Screen, BoxLayout):
-    main_color = ObjectProperty((1, 1, 1, 1))
+# Popup for unlocking and changing skins
+class PopupSkins(Popup):
+    """This class is the Popup widget where themes can be unlocked and changed.
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.second_color()
+    The code of this class is relatively short compared to the code of PopupBg.
+    This is because most of the code is written in Kivy's kv-language, located in
+    layout.kv, and because it's more convenient to use kv-language for these
+    kinds of tasks if there aren't many different skins to work with.
 
-    def second_color(self):
-        # from kivy.core.window import Window
+    This class will look more like PopupBg when more skins are added in a future
+    update.
 
-        im = store.get("background")["current_bg"]
-        m = Image.load(im, keep_data=True)
-        self.main_color = m.read_pixel(20, 10)
-        print(self.main_color)
-
-
-class PopupMenu(Popup):
-    pass
-
-
-class PopupOutfit(Popup):
+    """
     current_skin = ObjectProperty(store.get("skin")["current_skin"])
 
     def __init__(self, **kwargs):
+        """This __init__ function ensures that the correct skin is selected
+        when the popup is opened."""
         super().__init__(**kwargs)
 
         self.current_skin = store.get("skin")["current_skin"]
 
     def skin_switch(self):
+        """This is a simple function that changes and saves the current skin.
+
+        """
         print(self.current_skin)
         store.put("skin", current_skin=self.current_skin)
 
 
+# Popup for unlocking and changing word packs
+class PopupPacks(Popup):
+    """This class is the Popup widget where word packs can be unlocked and changed.
+
+    There are only two packs available at this moment. That is why, just like PopupSkins,
+    this class' code is very short.
+    """
+
+    current_pack = ObjectProperty(store.get("current_pack")["source"])
+    def __init__(self, **kwargs):
+        """This __init__ function ensures that the correct skin is selected
+                when the popup is opened."""
+        super().__init__(**kwargs)
+        self.current_pack = store.get("current_pack")["source"]
+
+    def pack_switch(self):
+        """This is a simple function that changes and saves the current pack.
+
+        """
+        print(self.current_pack)
+        store.put("current_pack", source=self.current_pack)
+
+
 class SettingsScreen(Screen, BoxLayout):
+    """This widget class contains the games settings.
+
+    The only settings that can be changed in this version of KaruApp are the
+    destination- and origin languages. More settings will be added in future
+    updates."""
     # Empty variables that will be filled using the flag buttons (see layout.kv line 951-1290)
     origin_lang = ""
     dest_lang = ""
@@ -1511,7 +1788,15 @@ class SettingsScreen(Screen, BoxLayout):
         self.second_color()
 
     def second_color(self):
-        # from kivy.core.window import Window
+        """This function is used for creating accent colors.
+
+        The rgba of a pixel from the current background is read using kivy's
+        Image.read_pixel() function and put in main_color. This will be used to
+        create accent colors.
+
+        This function exists in all the screen widgets to prevent NoneType errors.
+
+        """
 
         im = store.get("background")["current_bg"]
         m = Image.load(im, keep_data=True)
@@ -1520,22 +1805,24 @@ class SettingsScreen(Screen, BoxLayout):
 
     # Choose the origin language (would usually be user's native language)
     def choose_origin(self):
+        """This is a simple function to change the origin language
+        """
         # Changes "origin_lang" in user_data.json to chosen language. packData.py uses this json file for making and
         # importing wordlists
         store.put("origin_lang", language=self.origin_lang)
 
     # Choose the destination language (this is the language user wants to learn)
     def choose_dest(self):
+        """This is a simple function to change the destination language
+                """
         # Changes "dest_lang" in user_data.json to chosen language. packData.py uses this json file for making and
         # importing wordlists
         store.put("dest_lang", language=self.dest_lang)
 
 
-class WindowManager(ScreenManager):
-    pass
-
-
 class KaruApp(App):
+    """This is the main class of KaruApp, allowing the app to run
+    """
     WindowManager = WindowManager()
 
     def build(self):

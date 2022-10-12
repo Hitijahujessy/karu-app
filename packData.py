@@ -1,3 +1,9 @@
+"""A module that is used for storing and accessing data for KaruApp
+
+This module stores different data that is used in KaruApp. It also divides the
+word list DataFrames into seperate dictionary.
+
+"""
 from kivy.storage.jsonstore import JsonStore
 import pandas as pd
 
@@ -8,15 +14,15 @@ backgrounds = {1: 'resources/backgrounds/wallpaper.png', 2: 'resources/backgroun
                3: 'resources/backgrounds/wallpaper3.png', 4: 'resources/backgrounds/wallpaper4.png',
                5: 'resources/backgrounds/wallpaper5.png', 6: 'resources/backgrounds/wallpaper6.png',
                7: 'resources/backgrounds/wallpaper7.png', 8: 'resources/backgrounds/wallpaper8.png',
-               9: 'resources/backgrounds/wallpaper9.png'}
+               9: 'resources/backgrounds/wallpaper9.png', 10: 'resources/backgrounds/wallpaper10.png',
+               11: 'resources/backgrounds/wallpaper11.png', 12: 'resources/backgrounds/wallpaper12.png'}
 
-# Pack: In huis
-#df = pd.read_csv('resources/packs/huis/wordlist_huis.csv')
+current_bg = store.get("background")["current_bg"]
 
-# Pack: Dieren
+# Current pack (category)
 df = pd.read_csv(store.get("current_pack")["source"])
 
-# for language title in settings screen
+# Language titles for settings screen
 language_names = {"Dutch": "Dutch - Nederlands",
                   "English": "English",
                   "German": "German - Deutsch",

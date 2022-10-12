@@ -23,8 +23,8 @@
         id: mainmenu
     GameWidget:
         id: gw
-    KaruHouse:
-        id: kh
+    KaruStore:
+        id: ks
     SettingsScreen:
         id: settings
 
@@ -339,7 +339,7 @@
                     source: 'resources/icons/skins.png'
 
 
-<PopupMenu@Popup>
+<PopupPause@Popup>
     auto_dismiss: False
     size_hint_y: .8
     size_hint_x: .9
@@ -511,10 +511,7 @@
     secondary_color2: 0,.7,.7,1
     gw: app.root.ids.gw
     on_open: app.root.ids.mainmenu.second_color()
-    #on_dismiss: app.root.ids.mainmenu.second_color()#; app.root.ids.gw.second_color()
 
-    #kh: app.root.ids.kh
-    #title: ('KaruCoins: ' + str(round(self.wallet)))
     canvas.before:
         Color:
             rgba: 0, 0, 0, .75
@@ -539,7 +536,7 @@
     id: popuppacks
     size_hint_y: .5
     size_hint_x: .8
-    kh: app.root.ids.kh
+    ks: app.root.ids.ks
     title: ''
     title_size: 46
     separator_color: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .75]
@@ -637,11 +634,11 @@
 
 
 
-<PopupOutfit>:
-    id: popupoutfits
+<PopupSkins>:
+    id: popupskins
     size_hint_y: .6
     size_hint_x: .8
-    kh: app.root.ids.kh
+    ks: app.root.ids.ks
     title: ''
     title_size: 46
     separator_color: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], .75]
@@ -1136,7 +1133,7 @@
                 source: 'resources/icons/next.png'
     Button:
         id: menupop
-        on_press: AmbonWidget.click_button(); AmbonWidget.game_pause = True; AmbonWidget.pause_time(); Factory.PopupMenu().open()
+        on_press: AmbonWidget.click_button(); AmbonWidget.game_pause = True; AmbonWidget.pause_time(); Factory.PopupPause().open()
         on_release: print(AmbonWidget.game_pause)
         background_color: 0,0,0,0
         size_hint: .12, .07
@@ -1164,7 +1161,7 @@
         pos: root.pos
 
 
-<KaruHouse>:
+<KaruStore>:
     name: "third"
     orientation: 'vertical'
     size: root.width, root.height
@@ -1180,7 +1177,7 @@
 
 
     Button:
-        text: 'Achtergronden'
+        text: 'Backgrounds'
         size_hint: .2, .12
         on_press: app.root.ids.gw.click_button()
         on_release: Factory.PopupBg().open()
@@ -1200,7 +1197,7 @@
                 source: 'resources/icons/theme.png'
 
     Button:
-        text: 'Categorieën'
+        text: 'Packs'
         size_hint: .2, .12
         on_press: app.root.ids.gw.click_button()
         on_release: Factory.PopupPacks().open()
@@ -1220,10 +1217,10 @@
                 source: 'resources/icons/categories.png'
 
     Button:
-        text: 'Outfits'
+        text: 'Skins'
         size_hint: .2, .12
         on_press: app.root.ids.gw.click_button()
-        on_release: Factory.PopupOutfit().open()
+        on_release: Factory.PopupSkins().open()
         pos_hint: {"center_x":.5, "center_y":.45}
         background_color: 0, 0, 0, 0
         canvas:
