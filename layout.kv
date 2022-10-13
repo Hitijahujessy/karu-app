@@ -179,15 +179,13 @@
     background_disabled_normal: ''
     disabled_color: 0, 0, 0, 0
     charpos: app.root.ids.gw.charpos
-    secondary_color: (1, 1, 1, 1)#(1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .8)
-    #secondary_color2: (1.1 - app.root.ids.gw.main_color[0], 1.1 - app.root.ids.gw.main_color[1], 1.1 - app.root.ids.gw.main_color[2], .8)
+    secondary_color: (1, 1, 1, .7)
     on_press: self.text = '_'; self.color = (0,0,0,0); app.root.ids.gw.charpos==self.charpos; app.root.ids.gw.backspace()
     on_release: self.state='down'
     size_hint: .2, .2
     canvas.before:
         Color:
-            rgba: (1, 1, 1, .7) if self.state=='normal' else self.secondary_color  # visual feedback of press
-            #rgba: 1 - app.root.ids.gw.main_color[0], 1 - app.root.ids.gw.main_color[1], 1 - app.root.ids.gw.main_color[2], .8
+            rgba: self.secondary_color
         RoundedRectangle:
             pos: (self.x, self.y*1.125)
             size: self.width, self.height*.5
@@ -476,23 +474,31 @@
         pos_hint: {'x':1, 'y':1}
 
 <BgBar@ProgressBar>:
+    text: 'tddnsj'
     max: 5
     value: 1
     size_hint: .4, .5
-    canvas.after:
-        Color:
-            rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
-        BorderImage:
-            border: (12, 12, 12, 12)
-            pos: self.x, self.center_y - 12
-            size: self.width, 18
-            #source: 'blue.png'
-        Color:
-            rgba: app.root.ids.mainmenu.main_color
-        BorderImage:
-            border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
-            pos: self.x, self.center_y - 12
-            size: self.width * (self.value / float(self.max)) if self.max else 0, 18
+    Label:
+        id: bar_label
+        text: ''
+        font_size: 24
+
+        canvas.before:
+            Color:
+                rgba: [1 - app.root.ids.mainmenu.main_color[0], 1 - app.root.ids.mainmenu.main_color[1], 1 - app.root.ids.mainmenu.main_color[2], 1]
+            BorderImage:
+                border: (12, 12, 12, 12)
+                pos: root.x, root.center_y - 12
+                size: root.width, 18
+                #source: 'blue.png'
+            Color:
+                rgba: app.root.ids.mainmenu.main_color
+            BorderImage:
+                border: [int(min(root.width * (root.value / float(root.max)) if root.max else 0, 12))] * 4
+                pos: root.x, root.center_y - 12
+                size: root.width * (root.value / float(root.max)) if root.max else 0, 18
+
+
 
 #: import Clock kivy.clock.Clock
 <PopupBg>:
@@ -630,7 +636,10 @@
                     pos: self.x, self.center_y - 12
                     size: self.width * (self.value / float(self.max)) if self.max else 0, 18
                     #source: 'red.png'
-
+        Label:
+            text: "{}/{}".format(animal_unlock.value, animal_unlock.max)
+            font_size: 24
+            pos_hint: {"center_x": .75, "center_y": .1}
 
 
 
@@ -742,6 +751,10 @@
                     border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
                     pos: self.x, self.center_y - 12
                     size: self.width * (self.value / float(self.max)) if self.max else 0, 18
+        Label:
+            text: "{}/{}".format(sunglasses_unlock.value, sunglasses_unlock.max)
+            font_size: 24
+            pos_hint: {"center_x": .75, "center_y": .525}
         Button:
             id: clown_skin
             disabled: False if root.ids.clown_unlock.value==root.ids.clown_unlock.max else True
@@ -787,6 +800,10 @@
                     border: [int(min(self.width * (self.value / float(self.max)) if self.max else 0, 12))] * 4
                     pos: self.x, self.center_y - 12
                     size: self.width * (self.value / float(self.max)) if self.max else 0, 18
+        Label:
+            text: "{}/{}".format(clown_unlock.value, clown_unlock.max)
+            font_size: 24
+            pos_hint: {"center_x": .25, "center_y": .075}
 
 
 <GameWidget>:
@@ -839,6 +856,17 @@
     help_button: help_button.__self__
     sound_button: sound_button.__self__
     cd_label: cd_label.__self__
+    menupop: menupop.__self__
+    sound_button: sound_button.__self__
+    sound_amount: sound_amount.__self__
+    help_button: help_button.__self__
+    help_amount: help_amount.__self__
+    pass_button: pass_button.__self__
+    score_label: score_label.__self__
+    highscore_label: highscore_label.__self__
+    wallet_label: wallet_label.__self__
+    coin_icon: coin_icon.__self__
+    crown_icon: crown_icon.__self__
 
 
 

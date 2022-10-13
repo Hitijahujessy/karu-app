@@ -221,6 +221,8 @@ class GameWidget(Screen, FloatLayout):
         This function randomizes letter_btns text and sets word_buttons text.
     type_word()
         This function lets the letter_btns be used for typing words.
+    text_cursor()
+        This function creates a simple text cursor animation
     backspace()
         A function used for correcting typos.
     hint()
@@ -527,8 +529,9 @@ class GameWidget(Screen, FloatLayout):
         for x in range(len(self.current_word)):
             word_button = Factory.WordButton()
             self.grid.add_widget(word_button)
-            word_button.secondary_color = (
-                1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
+            # word_button.secondary_color = (
+            #     1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
+            word_button.secondary_color2 = (1, 1, 1, .7)
 
             # Used for correcting typos
             word_button.charpos = x
@@ -544,6 +547,7 @@ class GameWidget(Screen, FloatLayout):
                 word_button.color = (1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], 1)
             self.word_buttons.append(word_button)
 
+        self.text_cursor()
         self.start_time()
 
     # Function for typing words
@@ -582,23 +586,58 @@ class GameWidget(Screen, FloatLayout):
                     self.word_buttons[x].disabled = False
                     self.word_buttons[x].color = (1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], 1)
 
+                self.text_cursor()
                 break
             else:
                 continue
+
+    # A simple animation for the text cursor
+    def text_cursor(self):
+        """This function creates a simple text cursor animation
+
+        The animation fades between the word_button's usual color and the accent color.
+
+        """
+        animated_color = 1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], 1
+        anim = Animation(secondary_color=(animated_color), duration=.75)
+        anim += Animation(secondary_color=(1, 1, 1, .7), duration=.75)
+        anim.repeat = True
+
+        wordlength = len(self.emptyspace)
+
+        for x in range(wordlength):
+            # Check if current character is '_', if True, replace with letter on pressed button
+            anim.cancel_all(self.word_buttons[x-1])
+            self.word_buttons[x - 1].secondary_color = (1, 1, 1, .7)
+            #state = 'normal'
+
+            if self.word_buttons[x].text == '_':
+                print(f'button%d animation started' % x)
+                anim.start(self.word_buttons[x])
+                break
+
 
     # Function used for replacing a typo
     def backspace(self):
         """A function used for correcting typos.
 
         This is a simple function that removes the text from a word_button and
-        sets the charpos to that button, allowing a typo to be fixes.
+        sets the charpos to that button, allowing a typo to be fixed. It also
+        makes sure that the text_cursor() position is correct.
 
         """
         old_charpos = self.charpos + 1
+        for x in range(len(self.word_buttons)):
+            Animation.cancel_all(self.word_buttons[x])
+            self.word_buttons[x].secondary_color = (1, 1, 1, .7)
+
+        # self.word_buttons[self.charpos].secondary_color = (
+        #     1 - self.main_color[0], 1 - self.main_color[1], 1 - self.main_color[2], .75)
 
         if self.word_buttons[self.charpos] != '_':
             try:
                 self.word_buttons[(old_charpos + 1)].state = 'normal'
+                self.text_cursor()
             except Exception as e:
                 print(e)
 
@@ -637,6 +676,7 @@ class GameWidget(Screen, FloatLayout):
 
                 self.hints -= 1
                 self.ids.help_amount.text = str(self.hints)
+                self.text_cursor()
 
                 break
             else:
@@ -703,7 +743,7 @@ class GameWidget(Screen, FloatLayout):
         press_sound.volume = .8
         press_sound.play()
 
-    def play_sound(self):
+    def play_sound(self, *largs):
         """A function that plays a .wav file when sound_button is pressed, or when
         the level is completed/skipped.
 
@@ -800,8 +840,7 @@ class GameWidget(Screen, FloatLayout):
                     self.ids.pass_button.disabled = True
 
                     self.victory_sound()
-                    time.sleep(.8)
-                    self.play_sound()
+                    Clock.schedule_once(self.play_sound, .8)
 
                     # Make letter_btns invisible
                     letter_btn = [self.letter_btn1, self.letter_btn2, self.letter_btn3, self.letter_btn4,
@@ -817,6 +856,10 @@ class GameWidget(Screen, FloatLayout):
                             letter_btn[x].opacity = 0
                         except Exception as e:
                             print(e)
+
+                    for x in range(len(self.word_buttons)):
+                        Animation.cancel_all(self.word_buttons[x])
+                        self.word_buttons[x].secondary_color = (1, 1, 1, .7)
 
                 # if True, game is finished
                 elif self.level >= 10:
@@ -838,6 +881,7 @@ class GameWidget(Screen, FloatLayout):
                             continue
 
                 self.mistakes += 1
+                self.text_cursor()
 
     # Keeping time. Currently, this function (and the other time functions except stop_time) has no use but I'll keep it
     # in the code
@@ -1582,43 +1626,56 @@ class PopupBg(Popup):
 
                     self.bg_buy_buttons[btn_index].bind(on_press=partial(self.update_value, self.buy_backgroundnumber),
                                                         on_release=lambda y: self.checkout())
-
-                    # self.verandervalue(new_val)
-
                 else:
                     bar_index = self.buy_backgroundnumber - 10
                     unlock_bar = Factory.BgBar()
+
                     self.bg_bars.append(unlock_bar)
                     if bar_index == 0:
+                        print('i equal 0')
                         self.bg_bars[bar_index].max = 50
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
-                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
-                            # self.bg_buttons[self.buy_backgroundnumber].
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = True
-                        else:
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = False
-                    elif bar_index == 1:
+                        self.bg_bars[bar_index].ids.bar_label.text = "{}/{}".format(self.bg_bars[bar_index].value,
+                                                                                    self.bg_bars[bar_index].max)
+                        self.bg_bars[bar_index].ids.bar_label.pos = (self.bg_bars[bar_index].x + 70, self.bg_bars[
+                            bar_index].y + 70)
+                        # if self.bg_bars[bar_index].value >= self.bg_bars[bar_index].max:
+                        #     # self.bg_buttons[self.buy_backgroundnumber].
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = True
+                        # else:
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = False
+                    if bar_index == 1:
+                        print('i equal 1')
                         self.bg_bars[bar_index].max = 125
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
-                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
-                            # self.bg_buttons[self.buy_backgroundnumber].
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = True
-                        else:
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = False
-                    elif bar_index == 2:
+                        self.bg_bars[bar_index].ids.bar_label.text = "{}/{}".format(self.bg_bars[bar_index].value,
+                                                                                    self.bg_bars[bar_index].max)
+                        self.bg_bars[bar_index].ids.bar_label.pos = (self.bg_bars[bar_index].x + 250, self.bg_bars[
+                            bar_index].y + 70)
+                        # if self.bg_bars[bar_index].value >= self.bg_bars[bar_index].max:
+                        #     # self.bg_buttons[self.buy_backgroundnumber].
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = True
+                        # else:
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = False
+                    if bar_index == 2:
+                        print('i equal 2')
                         self.bg_bars[bar_index].max = 225
                         self.bg_bars[bar_index].value = store["data"]["correct_words"]
-                        if self.bg_bars[bar_index].value == self.bg_bars[bar_index].max:
-                            # self.bg_buttons[self.buy_backgroundnumber].
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = True
-                        else:
-                            bg_index = 'bg' + str(self.buy_backgroundnumber)
-                            self.unlocked_bg[bg_index] = False
+                        self.bg_bars[bar_index].ids.bar_label.text = "{}/{}".format(self.bg_bars[bar_index].value,
+                                                                                    self.bg_bars[bar_index].max)
+                        self.bg_bars[bar_index].ids.bar_label.pos = (self.bg_bars[bar_index].x + 430, self.bg_bars[
+                            bar_index].y + 70)
+                        # if self.bg_bars[bar_index].value >= self.bg_bars[bar_index].max:
+                        #     # self.bg_buttons[self.buy_backgroundnumber].
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = True
+                        # else:
+                        #     bg_index = 'bg' + str(self.buy_backgroundnumber)
+                        #     self.unlocked_bg[bg_index] = False
 
                     bg_grid.add_widget(self.bg_bars[bar_index])
 
@@ -1629,7 +1686,7 @@ class PopupBg(Popup):
 
         # Loop to check which backgrounds are unlocked, so the buttons can be enabled and disabled where needed
         self.backgroundnumber = 1
-        for x in range(len(self.bg_buy_buttons) + 2):
+        for x in range(len(self.bg_buy_buttons)):
             try:
                 bg_index = 'bg' + str(self.backgroundnumber)
                 if self.unlocked_bg[bg_index]:
@@ -1645,17 +1702,22 @@ class PopupBg(Popup):
 
             except Exception as e:
                 print(repr(e))
+                print('hey ;)')
 
         for x in range(len(self.bg_bars)):
             try:
-                bg_index = 'bg1' + str(x)
-                if self.unlocked_bg[bg_index]:
-                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_img)  # Remove lock button and img
-                    self.bg_buttons[x].remove_widget(self.bg_buttons[x].ids.lock_button)
+                bg_index = 'bg{}'.format(x + 10)
+                print(bg_index)
+                print(store['unlocked_backgrounds'][bg_index])
+                if store['unlocked_backgrounds'][bg_index]:
+                    # Remove lock button and img
+                    self.bg_buttons[(x + 9)].remove_widget(self.bg_buttons[(x + 9)].ids.lock_img)
+                    self.bg_buttons[(x + 9)].remove_widget(self.bg_buttons[(x + 9)].ids.lock_button)
                     self.unlocked_amount += 1
 
             except Exception as e:
                 print(repr(e))
+
 
     def update_value(self, val, *largs):
         """This function corrects the value of the backgroundnumbers
@@ -1700,6 +1762,7 @@ class PopupBg(Popup):
 
             self.wallet = self.wallet - price
             store.put("wallet", coins=self.wallet)
+
 
             store["unlocked_backgrounds"][index] = True
             store["unlocked_backgrounds"] = store["unlocked_backgrounds"]
