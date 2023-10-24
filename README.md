@@ -1,7 +1,5 @@
-<h1 align="center">Karu</h1>
-<p align="center">
-  <img src="resources/karulogo.png" width="200" height="200">
-</p>
+<h1 align="center"><img src="resources/karu/karulogo.png" width="200" height="200"></h1>
+
 
 <p align="center">
   Karu is an app that tries to help people with learning vocabulary of another language, in a gamified way. 
