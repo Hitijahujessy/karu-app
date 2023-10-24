@@ -48,7 +48,7 @@ import packData
 store = JsonStore('resources/user_data.json')  # For saving high score
 
 kivy.require('2.0.0')
-os.environ["KIVY_AUDIO"] = "audio_sdl2"
+#os.environ["KIVY_AUDIO"] = "audio_sdl2"
 Config.set('graphics', 'width', '360')  # (New Android smartphones e.g. OnePlus 7 series)
 Config.set('graphics', 'height', '640')  # (iPhone X, 11 and 12 series, upsampled)
 root_widget = Builder.load_file('layout.kv')
@@ -834,7 +834,10 @@ class GameWidget(Screen, FloatLayout):
                     self.level_finish = True  # Level is finished
                     self.stop_level()
 
-                    self.add_widget(self.ids.next_button)
+                    try:
+                        self.add_widget(self.ids.next_button)
+                    except Exception as e:
+                        print(e)
                     self.ids.sound_button.disabled = True
                     self.ids.help_button.disabled = True
                     self.ids.pass_button.disabled = True
@@ -1894,3 +1897,4 @@ class KaruApp(App):
 
 
 KaruApp().run()
+
