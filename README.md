@@ -3,15 +3,37 @@
 
 <p align="center">
   Karu is an app that tries to help people with learning vocabulary of another language, in a gamified way. 
-  The app is currently more aimed for children, but there are plans to make Karu enjoyable for all ages. 
+  The app is currently more aimed for children, but there are plans to make Karu enjoyable for all ages.
+  
 </p>
+<h6>
+  This version of Karu is a prototype, school-project-version of a greater goal. This is also why there are lot's of features missing, and why I
+  won't be optimizing the layout for Windows. More on this at the [Future](#future) section.
+</h6>
 
 ## Table of Contents
+- [About](#about)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+- [Future](#future)
+
+## About
+When I began with my programming course, I was allowed to choose what I wanted to do for my first project. I decided to make a simple, CLI application that retrieves tables from
+an online dictionary, save them in a .xml file and display them with a ````Pandas dataframe```. At the time, was starting to learn Ambonese (a creole language from the Central Moluccan Islands) and
+the dictionary that I used only allow to search Ambonese words, while I also wanted to be able to search English words to get the translation. This is why my project would be a win-win: I could learn
+about Python, Pandas and a bit of web-scraping, while also be able to learn Ambonese in a more efficient way.
+
+The project was pretty simple at first, but I kept adding new features, like adding words to a personal list, a quiz, adding your own words, et cetera. Although I was pretty satisfied and proud
+of the work that I put in, I also noticed that it was hard for my family and friends to figure out what was going on (CLI always seem to look like some advanced hacking-tool to most people). This led
+me to decide that I wanted to turn the simple CLI application into a gamified, user-friendly, language learning app. Besides the things that I learned when making the CLI app, I didn't have much
+experience with Python, and I knew a whole lot less about making GUI's. I had a classmate once that used Kivy, and that seemed fine to use for this, not-too-difficult, project.
+
+Because it all started with the Ambonese language, I wanted the mascot to be an animal that was endemic to the Moluccan islands. This was pretty difficult, because the islands are home to hundreds of species of birds of paradise, which weren't really an option because of a notorious green owl mascot. Reptiles were also not viable, because there already was a lizard mascot that's related to learning the Dutch
+dialect of Ambonese. While researching the islands' endemic animals, I finally found the perfect candidate: Moluccan Flying Fox (Pteropus chrysoproctus). In the almost extinct language of the island where
+my family on my mother's side originates from, flying foxes are called "karunno". This is how Karu was born.
 
 ## Features
 - 12 languages: Ambonese, Chinese, Dutch, English, French, German, Indonesian, Italian, Japanese, Korean, Russian and Spanish.
@@ -23,6 +45,7 @@
     - Themes have been implemented in a way that makes it easy to add new themes without too much hassle. The color of the chosen background is used to find a
       complementary color to use as the secondary/accent color.
     - New wordlists/categories are also easy to add and create, using the [Karu Translator]. Most of the time, you will only need to manually add the pictures.
+
 ## Installation
 Karu uses Python 3.11.5, Kivy, and Pandas.
 
@@ -79,21 +102,21 @@ Before running ```main.py```, please make sure to activate your ```virtual envir
 After opening the app, you will see the main menu. At the top, the Karu logo is displayed. The user is able to change Karu's outfit at the shop. Below the
 logo, you are able to see the amount of coins you own, and your current highscore. Finally, you will see three buttons with the following icons:
 
-  • <img src="resources/icons/play.png" width="100" height="100"> - Start the game.
-  • <img src="resources/icons/shop.png" width="100" height="100"> - Go to the shop, where you can unlock and select new outfits, themes and categories.
-  • <img src="resources/icons/settings.png" width="100" height="100"> - Change the settings, currently only used for switching between the different languages.
+  - <img src="resources/icons/play.png" width="25" height="25"> - Start the game.
+  - <img src="resources/icons/shop.png" width="25" height="25"> - Go to the shop, where you can unlock and select new outfits, themes and categories.
+  - <img src="resources/icons/settings.png" width="25" height="25"> - Change the settings, currently only used for switching between the different languages.
 
 ### Gameplay
 After a 3 second countdown, the game begins. A few things will appear, which uses are explained here:
 
-  • <img src="resources/icons/play.png" width="100" height="100"> - Pauses the game and opens a popup with: sliders for setting the volume (not yet functional), resume game button, return to main menu button.
-  • <img src="resources/icons/play.png" width="100" height="100"> - Score board, shows the current score, the highscore and the amount of coins that are earned in this game.
-  • <img src="resources/icons/play.png" width="100" height="100"> - Hint (letter) button, reveals the first letter to be typed (max. 5 uses per game).
-  • <img src="resources/icons/play.png" width="100" height="100"> - Hint (sound) button, plays an audio file where the word is pronounced (max. 5 uses per game).
-  • <img src="resources/icons/play.png" width="100" height="100"> - The current word, it shows the word-to-be-translated at the top, and an image of the word.
-  • <img src="resources/icons/play.png" width="100" height="100"> - Skip button, allows the user to not get stuck during a game by revealing the word (grants no points nor coins).
-  • <img src="resources/icons/play.png" width="100" height="100"> - These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
-  • <img src="resources/icons/play.png" width="100" height="100"> - A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
+  - <img src="resources/icons/play.png" width="25" height="25"> • Pauses the game and opens a popup with: sliders for setting the volume (not yet functional), resume game button, return to main menu button.
+  - <img src="resources/icons/play.png" width="25" height="25"> • Score board, shows the current score, the highscore and the amount of coins that are earned in this game.
+  - <img src="resources/icons/play.png" width="25" height="25"> • Hint (letter) button, reveals the first letter to be typed (max. 5 uses per game).
+  - <img src="resources/icons/play.png" width="25" height="25"> • Hint (sound) button, plays an audio file where the word is pronounced (max. 5 uses per game).
+  - <img src="resources/icons/play.png" width="25" height="25"> • The current word, it shows the word-to-be-translated at the top, and an image of the word.
+  - <img src="resources/icons/play.png" width="25" height="25"> • Skip button, allows the user to not get stuck during a game by revealing the word (grants no points nor coins).
+  - <img src="resources/icons/play.png" width="25" height="25"> • These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
+  - <img src="resources/icons/play.png" width="25" height="25"> • A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
 
 Each game consists of 10 levels. Per level, a maximum of 40 points and 10 coins can be earned, and these numbers get lower by making mistakes and by using hints.
 If no mistakes were made and no hints were used, it counts as ```flawless``` and 40 points are rewarded. Otherwise, the amount of points are calculating as follows:
@@ -103,3 +126,15 @@ If no mistakes were made and no hints were used, it counts as ```flawless``` and
 Coins are also calculated per level, but are only payed out if the user completes the entire game. This is to prevent users from farming coins by restarting as soon as mistakes are made or levels
 are skipped. If the level was ```flawless```, the user receives 10 coins, if the level was skipped, the user receives 0 coins, and otherwise the user receives 5 coins. I chose to do it this way
 because I think that making mistakes is an important part of learning and learning should be rewarded.
+
+Each correct answer is saved and can be used to unlock things in the shop.
+
+[Screenshot of gamewidget]
+
+### Shop
+When opening the shop section, you will find 4 buttons with the following icons:
+
+  - <img src="resources/icons/theme.png" width="25" height="25"> • Unlock and select different themes.
+  - <img src="resources/icons/categories.png" width="25" height="25"> • Unlock and select different word categories.
+  - <img src="resources/icons/skins.png" width="25" height="25"> • Unlock and select different outfits for Karu
+  - - <img src="resources/icons/home.png" width="25" height="25"> • Return to main menu
