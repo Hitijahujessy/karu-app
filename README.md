@@ -118,14 +118,13 @@ After a 3 second countdown, the game begins. A few things will appear, which use
   - <img src="resources/icons/play.png" width="25" height="25"> • These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
   - <img src="resources/icons/play.png" width="25" height="25"> • A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
 
-Each game consists of 10 levels. Per level, a maximum of 40 points and 10 coins can be earned, and these numbers get lower by making mistakes and by using hints.
+Each game consists of 10 levels. Per level, a maximum of 40 ```points``` and 10 ```coins``` can be earned, and these numbers get lower by making mistakes and by using hints.
 If no mistakes were made and no hints were used, it counts as ```flawless``` and 40 points are rewarded. Otherwise, the amount of points are calculating as follows:
 ```points = 30 - (letter-hints used * 3 + mistakes * 3 + sound-hints used * 5``` (see ```main.py line 908```)
   • So if I were to use 1 sound-hint, 2 letter-hints and made 1 mistake: ```points = 30 - (2 * 3 + 1 * 3 + 1 * 5) = 18 points```
 
 Coins are also calculated per level, but are only payed out if the user completes the entire game. This is to prevent users from farming coins by restarting as soon as mistakes are made or levels
-are skipped. If the level was ```flawless```, the user receives 10 coins, if the level was skipped, the user receives 0 coins, and otherwise the user receives 5 coins. I chose to do it this way
-because I think that making mistakes is an important part of learning and learning should be rewarded.
+are skipped. If the level was ```flawless```, the user receives 10 ```coins```, if the level was skipped, the user receives 0 ```coins```, and otherwise the user receives 5 ```coins```. I chose to do it this waybecause I think that making mistakes is an important part of learning and learning should be rewarded.
 
 Each correct answer is saved and can be used to unlock things in the shop.
 
@@ -136,5 +135,22 @@ When opening the shop section, you will find 4 buttons with the following icons:
 
   - <img src="resources/icons/theme.png" width="25" height="25"> • Unlock and select different themes.
   - <img src="resources/icons/categories.png" width="25" height="25"> • Unlock and select different word categories.
-  - <img src="resources/icons/skins.png" width="25" height="25"> • Unlock and select different outfits for Karu
-  - - <img src="resources/icons/home.png" width="25" height="25"> • Return to main menu
+  - <img src="resources/icons/skins.png" width="25" height="25"> • Unlock and select different outfits for Karu.
+  - <img src="resources/icons/home.png" width="25" height="25"> • Return to main menu
+
+Themes, categories and outfits can be unlocked by using ```coins``` or by the amount of ```correct answers``` given during the game. For example, the default category is "Home", which contains
+a list of words that you will find in and around the house, such as "couch", "bed", or "television". To unlock the "Animals" category, you need 35 ```correct answers```. This means that
+the user needs to play at least 4 times to unlock the new category, assuming that the user finishes 3 games without skipping and the 4th game without skipping more than 5 words.
+[example image with correct answers and at least 1 unlocked and 1 locked]
+
+There are 12 themes, including the default theme, of which 3 themes can be unlocked using ```correct answers```. The rest cost 250 ```coins```. A theme consists of 2 parts: the background image,
+and the accent color. The accent color is created dynamically, based on the color of the background image. This is currently not foolproof, because the in-game text can sometimes be a bit hard
+to read. [Example images]
+
+There are 2 categories, including de default. The "Home" category consists of 11 words and the "Animals" category consists of 34 words. 
+[Screenshot category section with animals locked]
+
+There are 3 outfits, including the default outfit. Currently, Karu doesn't have a body yet so the outfits only affect is head. There are plans to create a body and different animations for multiple
+scenarios, but for now Karu is just a selfie.
+[Screenshot outfits and outfit selected on main menu]
+
