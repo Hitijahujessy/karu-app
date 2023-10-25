@@ -154,3 +154,14 @@ There are 3 outfits, including the default outfit. Currently, Karu doesn't have 
 scenarios, but for now Karu is just a selfie.
 [Screenshot outfits and outfit selected on main menu]
 
+### Settings
+At the settings section, there are 2 lists above eachother with country flags. I refer to them as the ```origin language``` and the  ```destination language```. With hindsight, it was better to use
+something like ```main language``` or whatever, but this works fine for me. The ```origin language``` is likely to be the language the user is already familiar with. In-game, the word displayed above
+the image is writtin in the ```origin language```, and the word that has to be the answer is written in the ```destination language```. 
+
+It is important to note that almost every language is just a place-holder and was used for me to play around with this app's (and [KaruTranslator]'s) functions with allowing multiple languages. I
+haven't studied Chinese or Italian so there might be tons of errors. Everything is 100% Google Translate, except for Dutch, Indonesian, Ambonese and English.
+
+
+
+
