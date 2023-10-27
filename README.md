@@ -159,9 +159,17 @@ At the settings section, there are 2 lists above eachother with country flags. I
 something like ```main language``` or whatever, but this works fine for me. The ```origin language``` is likely to be the language the user is already familiar with. In-game, the word displayed above
 the image is writtin in the ```origin language```, and the word that has to be the answer is written in the ```destination language```. 
 
-It is important to note that almost every language is just a place-holder and was used for me to play around with this app's (and [KaruTranslator]'s) functions with allowing multiple languages. I
-haven't studied Chinese or Italian so there might be tons of errors. Everything is 100% Google Translate, except for Dutch, Indonesian, Ambonese and English.
+It is important to note that almost every language is just a place-holder and was used for me to play around with this app's (and [KaruTranslator]'s) functions by allowing multiple languages. I
+haven't studied Chinese or Italian so there might be tons of errors. Everything is 98% Google Translate, except for Dutch, Indonesian, Ambonese and English.
 
+More features are planned for this section, like volume regulators, statistics, and an optional reset function.
 
+## Future
 
+As you may have found out by reading this README or by running Karu, there a lots of things to add and improve. The UI is not optimized for Windows computers, the MacOS version isn't that good either,
+multiple gameplay functions are incomplete or non-existent, et cetera. I have learned a lot during the development of this project and it was a great experience. One thing I do realize now is that Python
+and Kivy are not ideal for developing apps like Karu. This is why I decided that I will completely remake this app in C#.
+
+I call it a remake, but it's more like a "final piece". If the C# version of Karu would be a painting, the current version wouldn't even be sketch. Instead, it was practice, an idea, and an example of both 
+the dos and don'ts. That being said, I still have to learn the basics of C#, so the road might be quite long. I am, however, very excited and motivated to turn this thing into a functional product to be proud of.
 
