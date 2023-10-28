@@ -45,7 +45,7 @@ my family on my mother's side originates from, flying foxes are called "karunno"
     - Themes have been implemented in a way that makes it easy to add new themes without too much hassle. The color of the chosen background is used to find a
       complementary color to use as the secondary/accent color.
     - New wordlists/categories are also easy to add and create, using the [Karu Translator]. Most of the time, you will only need to manually add the pictures.
-
+ 
 ## Installation
 Karu uses Python 3.11.5, Kivy, and Pandas.
 
@@ -110,13 +110,13 @@ logo, you are able to see the amount of coins you own, and your current highscor
 After a 3 second countdown, the game begins. A few things will appear, which uses are explained here:
 
   - <img src="resources/icons/pause.png" width="25" height="25"> • Pauses the game and opens a popup with: sliders for setting the volume (not yet functional), resume game button, return to main menu button.
-  - <img src="resources/icons/play.png" width="25" height="25"> • Score board, shows the current score, the highscore and the amount of coins that are earned in this game.
+  - <img src="resources/img for readme/scoreboard.png" width="25" height="25"> • Score board, shows the current score, the highscore and the amount of coins that are earned in this game.
   - <img src="resources/icons/suggestion.png" width="25" height="25"> • Hint (letter) button, reveals the first letter to be typed (max. 5 uses per game).
   - <img src="resources/icons/sound.png" width="25" height="25"> • Hint (sound) button, plays an audio file where the word is pronounced (max. 5 uses per game).
-  - <img src="resources/icons/play.png" width="25" height="25"> • The current word, it shows the word-to-be-translated at the top, and an image of the word.
+  - <img src="resources/img for readme/currentword.png" width="25" height="25"> • The current word, it shows the word-to-be-translated at the top, and an image of the word.
   - <img src="resources/icons/skip.png" width="25" height="25"> • Skip button, allows the user to not get stuck during a game by revealing the word (grants no points nor coins).
-  - <img src="resources/icons/play.png" width="25" height="25"> • These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
-  - <img src="resources/icons/play.png" width="25" height="25"> • A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
+  - <img src="resources/img for readme/wordbutton.png" width="25" height="25"> • These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
+  - <img src="resources/img for readme/letterbutton.png" width="25" height="25"> • A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
 
 Each game consists of 10 levels. Per level, a maximum of 40 ```points``` and 10 ```coins``` can be earned, and these numbers get lower by making mistakes and by using hints.
 If no mistakes were made and no hints were used, it counts as ```flawless``` and 40 points are rewarded. Otherwise, the amount of points are calculating as follows:
@@ -128,8 +128,8 @@ are skipped. If the level was ```flawless```, the user receives 10 ```coins```, 
 
 Each correct answer is saved and can be used to unlock things in the shop.
 
-[Screenshot of gamewidget]
-
+<img src="resources/img for readme/gamescreen.png">
+<img src="resources/img for readme/gamescreen.gif">
 ### Shop
 When opening the shop section, you will find 4 buttons with the following icons:
 
@@ -141,18 +141,19 @@ When opening the shop section, you will find 4 buttons with the following icons:
 Themes, categories and outfits can be unlocked by using ```coins``` or by the amount of ```correct answers``` given during the game. For example, the default category is "Home", which contains
 a list of words that you will find in and around the house, such as "couch", "bed", or "television". To unlock the "Animals" category, you need 35 ```correct answers```. This means that
 the user needs to play at least 4 times to unlock the new category, assuming that the user finishes 3 games without skipping and the 4th game without skipping more than 5 words.
-[example image with correct answers and at least 1 unlocked and 1 locked]
 
 There are 12 themes, including the default theme, of which 3 themes can be unlocked using ```correct answers```. The rest cost 250 ```coins```. A theme consists of 2 parts: the background image,
 and the accent color. The accent color is created dynamically, based on the color of the background image. This is currently not foolproof, because the in-game text can sometimes be a bit hard
-to read. [Example images]
+to read. 
+<img src="resources/img for readme/themescreen.png">
 
 There are 2 categories, including de default. The "Home" category consists of 11 words and the "Animals" category consists of 34 words. 
-[Screenshot category section with animals locked]
 
 There are 3 outfits, including the default outfit. Currently, Karu doesn't have a body yet so the outfits only affect is head. There are plans to create a body and different animations for multiple
 scenarios, but for now Karu is just a selfie.
-[Screenshot outfits and outfit selected on main menu]
+
+<img src="resources/img for readme/shopscreen.png">
+<img src="resources/img for readme/shopscreen.gif">
 
 ### Settings
 At the settings section, there are 2 lists above eachother with country flags. I refer to them as the ```origin language``` and the  ```destination language```. With hindsight, it was better to use
@@ -163,6 +164,9 @@ It is important to note that almost every language is just a place-holder and wa
 haven't studied Chinese or Italian so there might be tons of errors. Everything is 98% Google Translate, except for Dutch, Indonesian, Ambonese and English.
 
 More features are planned for this section, like volume regulators, statistics, and an optional reset function.
+
+<img src="resources/img for readme/settingsscreen.png">
+<img src="resources/img for readme/settingsscreen.gif">
 
 ## Future
 
