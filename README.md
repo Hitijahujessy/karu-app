@@ -1,11 +1,11 @@
-<h1 align="center"><img src="resources/karu/karulogo.png" width="200" height="200"></h1>
+<h1 align="center"><img src="resources/karu/karulogo.png" width="250" height="250"></h1>
 
 
-<p align="center">
+<h3 align="center">
   Karu is an app that tries to help people with learning vocabulary of another language, in a gamified way. 
   The app is currently more aimed for children, but there are plans to make Karu enjoyable for all ages.
   
-</p>
+</h3>
 <h6>
   This version of Karu is a prototype, school-project-version of a greater goal. This is also why there are lot's of features missing, and why I
   won't be optimizing the layout for Windows. More on this at the [Future](#future) section.
@@ -16,6 +16,9 @@
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Gameplay](#gameplay)
+  - [Shop](#shop)
+  - [Settings](#settings) 
 - [Future](#future)
 
 ## About
