@@ -16,8 +16,6 @@
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 - [Future](#future)
 
 ## About
@@ -128,8 +126,11 @@ are skipped. If the level was ```flawless```, the user receives 10 ```coins```, 
 
 Each correct answer is saved and can be used to unlock things in the shop.
 
-<img src="resources/img for readme/gamescreen.png">
-<img src="resources/img for readme/gamescreen.gif">
+<div class="row">
+  <img src="resources/img for readme/gamescreen.png" width="270" height="480">
+  <img src="resources/img for readme/gamescreen.gif" width="270" height="480">
+</div>
+
 ### Shop
 When opening the shop section, you will find 4 buttons with the following icons:
 
@@ -145,15 +146,17 @@ the user needs to play at least 4 times to unlock the new category, assuming tha
 There are 12 themes, including the default theme, of which 3 themes can be unlocked using ```correct answers```. The rest cost 250 ```coins```. A theme consists of 2 parts: the background image,
 and the accent color. The accent color is created dynamically, based on the color of the background image. This is currently not foolproof, because the in-game text can sometimes be a bit hard
 to read. 
-<img src="resources/img for readme/themescreen.png">
+<img src="resources/img for readme/themescreen.png" width="270" height="480">
 
 There are 2 categories, including de default. The "Home" category consists of 11 words and the "Animals" category consists of 34 words. 
 
 There are 3 outfits, including the default outfit. Currently, Karu doesn't have a body yet so the outfits only affect is head. There are plans to create a body and different animations for multiple
 scenarios, but for now Karu is just a selfie.
 
-<img src="resources/img for readme/shopscreen.png">
-<img src="resources/img for readme/shopscreen.gif">
+<div class="row">
+  <img src="resources/img for readme/shopscreen.png" width="270" height="480">
+  <img src="resources/img for readme/shopscreen.gif" width="270" height="480">
+</div>
 
 ### Settings
 At the settings section, there are 2 lists above eachother with country flags. I refer to them as the ```origin language``` and the  ```destination language```. With hindsight, it was better to use
@@ -165,8 +168,11 @@ haven't studied Chinese or Italian so there might be tons of errors. Everything 
 
 More features are planned for this section, like volume regulators, statistics, and an optional reset function.
 
-<img src="resources/img for readme/settingsscreen.png">
-<img src="resources/img for readme/settingsscreen.gif">
+<div class="row">
+  <img src="resources/img for readme/settingsscreen.png" width="270" height="480">
+  <img src="resources/img for readme/settingsscreen.gif" width="270" height="480">
+</div>
+
 
 ## Future
 
