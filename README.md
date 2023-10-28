@@ -109,12 +109,12 @@ logo, you are able to see the amount of coins you own, and your current highscor
 ### Gameplay
 After a 3 second countdown, the game begins. A few things will appear, which uses are explained here:
 
-  - <img src="resources/icons/play.png" width="25" height="25"> • Pauses the game and opens a popup with: sliders for setting the volume (not yet functional), resume game button, return to main menu button.
+  - <img src="resources/icons/pause.png" width="25" height="25"> • Pauses the game and opens a popup with: sliders for setting the volume (not yet functional), resume game button, return to main menu button.
   - <img src="resources/icons/play.png" width="25" height="25"> • Score board, shows the current score, the highscore and the amount of coins that are earned in this game.
-  - <img src="resources/icons/play.png" width="25" height="25"> • Hint (letter) button, reveals the first letter to be typed (max. 5 uses per game).
-  - <img src="resources/icons/play.png" width="25" height="25"> • Hint (sound) button, plays an audio file where the word is pronounced (max. 5 uses per game).
+  - <img src="resources/icons/suggestion.png" width="25" height="25"> • Hint (letter) button, reveals the first letter to be typed (max. 5 uses per game).
+  - <img src="resources/icons/sound.png" width="25" height="25"> • Hint (sound) button, plays an audio file where the word is pronounced (max. 5 uses per game).
   - <img src="resources/icons/play.png" width="25" height="25"> • The current word, it shows the word-to-be-translated at the top, and an image of the word.
-  - <img src="resources/icons/play.png" width="25" height="25"> • Skip button, allows the user to not get stuck during a game by revealing the word (grants no points nor coins).
+  - <img src="resources/icons/skip.png" width="25" height="25"> • Skip button, allows the user to not get stuck during a game by revealing the word (grants no points nor coins).
   - <img src="resources/icons/play.png" width="25" height="25"> • These are where the typed letters appear. Can be pressed to fix a typo. Current position is displayed using the accent color.
   - <img src="resources/icons/play.png" width="25" height="25"> • A total of 18 buttons that contain the letters of the word and random letters, displayed in a random order. 
 
