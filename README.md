@@ -45,7 +45,7 @@ my family on my mother's side originates from, flying foxes are called "karunno"
 - Earn coins for each correct answer and use them to unlock new outfits for Karu, new themes, and new categories.
     - Themes have been implemented in a way that makes it easy to add new themes without too much hassle. The color of the chosen background is used to find a
       complementary color to use as the secondary/accent color.
-    - New wordlists/categories are also easy to add and create, using the [Karu Translator]. Most of the time, you will only need to manually add the pictures.
+    - New wordlists/categories are also easy to add and create, using the (Karu Translator)[https://github.com/Hitijahujessy/KaruTranslator]. Most of the time, you will only need to manually add the pictures.
  
 ## Installation
 Karu uses Python 3.11.5, Kivy, and Pandas.
